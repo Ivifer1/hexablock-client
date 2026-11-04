@@ -1,0 +1,246 @@
+{
+  "changeRecordsDir": "docs/ai/change-records",
+  "changeRecordRequiredSections": [
+    "Implementation notes",
+    "Verification",
+    "AI usage"
+  ],
+  "requireApprovedProposal": true,
+  "gatedPaths": [
+    "src/**"
+  ],
+  "testPaths": [
+    "test/**",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.e2e-spec.ts"
+  ],
+  "protectedPaths": [
+    ".claude/**",
+    "CLAUDE.md",
+    "eslint.config.js",
+    ".oxlintrc.json",
+    "test/architecture/**",
+    ".github/workflows/**",
+    "tsconfig.json",
+    "package.json"
+  ],
+  "projectName": "HexaBlock Suite client (Expo + React Native + TypeScript)",
+  "engineCorePaths": [
+    "src/domain/engine/**",
+    "src/domain/board/**",
+    "src/domain/geometry/**",
+    "src/application/**"
+  ],
+  "layers": [
+    {
+      "name": "domain",
+      "paths": [
+        "src/domain/**"
+      ],
+      "forbiddenLayers": [
+        "application",
+        "adapters",
+        "infrastructure"
+      ],
+      "forbiddenPackages": [
+        "react",
+        "react-native",
+        "expo",
+        "expo-*",
+        "@expo/*",
+        "@react-native-async-storage/*",
+        "@react-navigation/*",
+        "axios",
+        "i18next",
+        "react-i18next"
+      ],
+      "forbiddenApis": [
+        {
+          "pattern": "\\bMath\\.random\\s*\\(",
+          "message": "uses Math.random(). Randomness is infrastructure: inject a seeded source through a port (e.g. IRandomSource / IPieceSource) so games are reproducible in tests."
+        },
+        {
+          "pattern": "\\bDate\\.now\\s*\\(|\\bnew\\s+Date\\s*\\(|\\bperformance\\.now\\s*\\(",
+          "message": "reads the system clock. Time is infrastructure: depend on a clock port (e.g. IClock) and inject it."
+        },
+        {
+          "pattern": "\\bconsole\\.\\w+\\s*\\(",
+          "message": "logs with console. Logging is a cross-cutting concern: implement it as an AOP decorator around the use case, never inside business code."
+        },
+        {
+          "pattern": "\\bfetch\\s*\\(|\\bXMLHttpRequest\\b|\\bWebSocket\\b",
+          "message": "performs network I/O. Network access lives in an adapter behind a port."
+        },
+        {
+          "pattern": "\\blocalStorage\\b|\\bsessionStorage\\b|\\bAsyncStorage\\b|\\bindexedDB\\b",
+          "message": "touches storage directly. Persistence lives behind a repository port (e.g. IProgressRepository)."
+        },
+        {
+          "pattern": "\\bprocess\\.env\\b",
+          "message": "reads environment variables. Configuration is injected from the composition root."
+        },
+        {
+          "pattern": "\\bset(Timeout|Interval)\\s*\\(",
+          "message": "uses timers. Scheduling belongs to an outer layer; inner layers react to explicit calls or events."
+        }
+      ]
+    },
+    {
+      "name": "application",
+      "paths": [
+        "src/application/**"
+      ],
+      "forbiddenLayers": [
+        "adapters",
+        "infrastructure"
+      ],
+      "forbiddenPackages": [
+        "react",
+        "react-native",
+        "expo",
+        "expo-*",
+        "@expo/*",
+        "@react-native-async-storage/*",
+        "@react-navigation/*",
+        "axios",
+        "i18next",
+        "react-i18next"
+      ],
+      "forbiddenApis": [
+        {
+          "pattern": "\\bMath\\.random\\s*\\(",
+          "message": "uses Math.random(). Randomness is infrastructure: inject a seeded source through a port (e.g. IRandomSource / IPieceSource) so games are reproducible in tests."
+        },
+        {
+          "pattern": "\\bDate\\.now\\s*\\(|\\bnew\\s+Date\\s*\\(|\\bperformance\\.now\\s*\\(",
+          "message": "reads the system clock. Time is infrastructure: depend on a clock port (e.g. IClock) and inject it."
+        },
+        {
+          "pattern": "\\bconsole\\.\\w+\\s*\\(",
+          "message": "logs with console. Logging is a cross-cutting concern: implement it as an AOP decorator around the use case, never inside business code."
+        },
+        {
+          "pattern": "\\bfetch\\s*\\(|\\bXMLHttpRequest\\b|\\bWebSocket\\b",
+          "message": "performs network I/O. Network access lives in an adapter behind a port."
+        },
+        {
+          "pattern": "\\blocalStorage\\b|\\bsessionStorage\\b|\\bAsyncStorage\\b|\\bindexedDB\\b",
+          "message": "touches storage directly. Persistence lives behind a repository port (e.g. IProgressRepository)."
+        },
+        {
+          "pattern": "\\bprocess\\.env\\b",
+          "message": "reads environment variables. Configuration is injected from the composition root."
+        },
+        {
+          "pattern": "\\bset(Timeout|Interval)\\s*\\(",
+          "message": "uses timers. Scheduling belongs to an outer layer; inner layers react to explicit calls or events."
+        }
+      ]
+    },
+    {
+      "name": "adapters",
+      "paths": [
+        "src/adapters/**"
+      ],
+      "forbiddenLayers": [
+        "infrastructure"
+      ],
+      "forbiddenPackages": [
+        "expo",
+        "expo-*",
+        "@expo/*",
+        "@react-native-async-storage/*"
+      ],
+      "forbiddenApis": []
+    },
+    {
+      "name": "infrastructure",
+      "paths": [
+        "src/infrastructure/**"
+      ],
+      "forbiddenLayers": [],
+      "forbiddenPackages": [],
+      "forbiddenApis": []
+    }
+  ],
+  "lint": {
+    "command": [
+      "npx",
+      "--no-install",
+      "eslint",
+      "--max-warnings=0"
+    ],
+    "paths": [
+      "src/**",
+      "test/**"
+    ]
+  },
+  "stop": {
+    "commands": [
+      [
+        "npm",
+        "run",
+        "typecheck"
+      ],
+      [
+        "npm",
+        "run",
+        "lint"
+      ],
+      [
+        "npm",
+        "test",
+        "--",
+        "--silent"
+      ]
+    ],
+    "maxBlocks": 3,
+    "explanationMarkers": [
+      "## Explicación del cambio",
+      "Explicación del cambio"
+    ]
+  },
+  "git": {
+    "protectedBranches": [
+      "main",
+      "master"
+    ],
+    "commitTypes": [
+      "feat",
+      "fix",
+      "docs",
+      "style",
+      "refactor",
+      "perf",
+      "test",
+      "build",
+      "ci",
+      "chore",
+      "revert"
+    ],
+    "maxSubjectLength": 72,
+    "scopes": [
+      "engine",
+      "board",
+      "geometry",
+      "hexa-lines",
+      "hexa-fit",
+      "hexa-sort",
+      "hexa-merge",
+      "levels",
+      "ui",
+      "i18n",
+      "audio",
+      "persistence",
+      "aop",
+      "specs",
+      "harness",
+      "deps",
+      "ci",
+      "docs",
+      "readme"
+    ]
+  }
+}
