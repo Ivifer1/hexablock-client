@@ -59,7 +59,7 @@ IDs are stable and never reused. The backend repo has its own catalog; cross-rep
 | C-009 | GitHub with protected branches, PRs, Conventional Commits in English. | 2, 6.2 |
 | C-010 | README in English with the required sections; `AI_USAGE.md` at the root. | 6, 7 |
 | C-011 | Class, layer and extensibility diagrams in `/docs` (image + editable source). | 4 |
-| C-012 | Delivered as an Android or iOS executable in a GitHub release, by 2026-12-14. | 8 |
+| C-012 | Delivered as Android and iOS executables in a GitHub release, by 2026-12-14. | 8 |
 
 ## Open questions (brief is silent; the team decides and records an ADR or a BR)
 - Hexa Merge: can a tile merge more than once per move? Is the target tile configurable?

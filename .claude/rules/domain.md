@@ -9,7 +9,9 @@ Purpose: game concepts and rules, independent of React Native, Expo, storage and
 Allowed imports: other files in `src/domain/**` and the TypeScript standard library. Nothing else.
 
 What belongs here:
-- Geometry: `HexCoord` (axial q, r), neighbours, the 3 axes, rings, 60° rotation, board shapes (hexagon of radius N, arbitrary figure).
+- Geometry: the topology contract `ITopology<TCoord>` (coordinates, neighbours, directions, lines, rotations). Rules ask the
+  topology and never assume 6 directions, 3 axes or 60°, because the cell shape may change (triangles, squares, octagons).
+  The hexagonal topology (`HexCoord` axial q, r; 3 axes; rings; 60° rotation; hexagon of radius N, arbitrary figure) is one implementation.
 - `HexBoard<TCell>`: written ONCE, parametrized by cell content; exposes iteration (Iterator pattern) by axis, ring and neighbourhood
   without exposing its internal representation.
 - `IGameRules<TCell, TMove, TState>`, `GameEngine<TCell, TMove, TState>` (Template Method turn skeleton: validate → apply → resolve → evaluate → notify),
