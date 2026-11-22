@@ -86,7 +86,7 @@ Ivifer Pita must not implement game-board rules or a second copy of the HexaBloc
 | 3 | Seeded random port | Sebastián Llambí + Leonardo Ibarra | Application port and infrastructure adapter |
 | 4 | Generic use cases | Sebastián Llambí | Start, apply move, undo/redo and progress use cases |
 | 5 | Output presenters | Leonardo Ibarra | HUD, controls, level selection, victory and defeat presenters |
-| 6 | Home screen | Leonardo Ibarra | Hex selector and selected-game card matching `01-inicio.md` and the attached mockup |
+| 6 | Home screen | Leonardo Ibarra | Hex selector and selected-game card matching `docs/specs/screens/01-inicio.md` and `docs/ui-context/screens/01-inicio/proposed-design.png` |
 | 7 | Progress adapter | Leonardo Ibarra | Local repository implementation behind `IProgressRepository` |
 | 8 | API contract alignment | Leonardo Ibarra + Ivifer Pita | Matching DTO and endpoint contracts across repositories |
 
@@ -114,7 +114,7 @@ Never branch or commit directly to `main`.
 
 ### Leonardo Ibarra
 
-1. Read `docs/ui-context/01-inicio.md`, `docs/ui-context/10-textos.md` and `docs/ui-context/design-tokens.css`.
+1. Read `docs/specs/screens/01-inicio.md`, `docs/specs/screens/10-textos.md`, `docs/ui-context/screens/01-inicio/proposed-design.md` and `docs/ui-context/design-tokens.css`.
 2. Read `.agents/rules/adapters.md`, `.agents/rules/infrastructure.md` and the approved output DTO ports.
 3. Create the proposal change record and wait for human approval.
 4. Add failing presenter/controller/UI tests or fixtures.

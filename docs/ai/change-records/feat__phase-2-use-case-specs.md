@@ -13,7 +13,7 @@ Date: 2026-11-22
 ## Problem
 Fase 1 established the application/adapter/infrastructure boundary but does not implement a board, game engine or gameplay flow. Fase 2 must add the generic engine and the first use cases without importing React Native or concrete variants.
 
-The home screen also needs a concrete design handoff for `docs/ui-context/01-inicio.md`. The mockup establishes a 360 px mobile composition, a hexagonal mode selector and a selected-mode action card. The local design token catalog establishes typography, spacing, radius, color and theme variables.
+The home screen also needs a concrete design handoff for `docs/specs/screens/01-inicio.md`. The mockup in `docs/ui-context/screens/01-inicio/proposed-design.png` establishes a 360 px mobile composition, a hexagonal mode selector and a selected-mode action card. The local design token catalog establishes typography, spacing, radius, color and theme variables.
 
 ## Proposed design
 Implement a generic core with immutable state and injected strategies. One generic use case will handle moves for every variant. Concrete variants will supply board setup, move validation, state transitions, scoring and history policy.
@@ -58,7 +58,7 @@ Implement a generic core with immutable state and injected strategies. One gener
 | Decorator/AOP | logging/timing decorators over generic use cases | Adds cross-cutting behavior without business-code catches or logs. | Console calls and try/catch inside use cases. |
 
 ## Home screen design handoff
-The `01-inicio.md` implementation will follow the attached 360 px mockup:
+The Inicio implementation will follow `docs/ui-context/screens/01-inicio/proposed-design.png`:
 
 - Header with HexaBlock mark and settings action.
 - Rotating hex selector in the center; selected mode at top and Lines/Merge/Fit/Sort around it.
@@ -74,7 +74,7 @@ The existing CSS tokens will be used by React Native adapters as equivalent valu
 - 360 px minimum supported width
 - 24 px, 32 px and 40 px spacing groups
 
-Figma MCP access returned the Starter-plan call limit. This proposal does not claim exact component names or library assets from Figma. The local `01-inicio.md`, local CSS tokens and attached mockup are the review source until Figma access is available.
+Figma MCP access returned the Starter-plan call limit. This proposal does not claim exact component names or library assets from Figma. The local Inicio specification, local CSS tokens and attached proposed design are the review source until Figma access is available.
 
 ## Extensibility and infrastructure independence
 - A fifth variant adds one factory, one rules implementation, one piece source/scoring setup and one registration.

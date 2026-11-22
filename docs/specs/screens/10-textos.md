@@ -57,6 +57,8 @@ Versión 0.1 · 2026-11-01 · Fuente única de textos para las pantallas 01 a 09
 | --- | --- | --- |
 | `app.title` | HexaBlock Suite | HexaBlock Suite |
 | `home.settings` | Ajustes | Settings |
+| `home.play` | Jugar | Play |
+| `home.points` | Puntos | Points |
 | `home.session_user` | Hola, {name} | Hi, {name} |
 | `home.error_progress` | No se pudo cargar tu progreso | We couldn't load your progress |
 | `home.empty` | No hay juegos disponibles | No games available |

@@ -7,6 +7,9 @@ const descriptor: GameModeDescriptor = {
   descriptionKey: 'games.fit.description',
   entryKind: 'DIRECT',
   progressDescriptor: 'best-score',
+  previewKey: 'hexa-fit',
+  iconKey: 'hexa-fit',
+  accentColor: '#D97706',
   hudComponents: ['score', 'moves'],
   controls: ['pause', 'undo'],
 };

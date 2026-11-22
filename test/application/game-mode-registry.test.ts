@@ -7,6 +7,9 @@ const descriptor: GameModeDescriptor = {
   descriptionKey: 'games.lines.description',
   entryKind: 'LEVELS',
   progressDescriptor: 'stars',
+  previewKey: 'lines',
+  iconKey: 'lines',
+  accentColor: '#0891B2',
   hudComponents: ['score'],
   controls: ['pause'],
 };
@@ -46,4 +49,56 @@ describe('GameModeRegistry', () => {
       'A game mode with id "hexa-lines" is already registered.',
     );
   });
+
+  it('should_return_all_registered_modes_when_home_loads', () => {
+    // Arrange
+    const mergeDescriptor: GameModeDescriptor = {
+      ...descriptor,
+      id: 'hexa-merge',
+      entryKind: 'DIRECT',
+    };
+    const registry = new GameModeRegistry([descriptor, mergeDescriptor]);
+
+    // Act
+    const result = registry.findAll();
+
+    // Assert
+    expect(result).toEqual([descriptor, mergeDescriptor]);
+  });
+
+  it('should_return_added_fifth_mode_when_descriptor_is_registered', () => {
+    // Arrange
+    const fifthDescriptor: GameModeDescriptor = {
+      ...descriptor,
+      id: 'hexa-fill',
+      entryKind: 'DIRECT',
+    };
+    const registry = new GameModeRegistry([descriptor]);
+
+    // Act
+    registry.register(fifthDescriptor);
+    const result = registry.findAll();
+
+    // Assert
+    expect(result).toContain(fifthDescriptor);
+  });
+
+  it.each(['DIRECT', 'LEVELS'] as const)(
+    'should_keep_entry_kind_%s_when_descriptor_is_registered',
+    (entryKind) => {
+      // Arrange
+      const modeDescriptor: GameModeDescriptor = {
+        ...descriptor,
+        id: `mode-${entryKind.toLowerCase()}`,
+        entryKind,
+      };
+      const registry = new GameModeRegistry([modeDescriptor]);
+
+      // Act
+      const result = registry.findById(modeDescriptor.id);
+
+      // Assert
+      expect(result?.entryKind).toBe(entryKind);
+    },
+  );
 });

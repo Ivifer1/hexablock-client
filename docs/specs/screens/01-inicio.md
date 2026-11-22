@@ -1,9 +1,15 @@
 # Pantalla 01 — Inicio y selector de juego
 
+## Material relacionado
+
+- Diseño propuesto: [proposed-design.md](../../ui-context/screens/01-inicio/proposed-design.md)
+- Imagen de referencia: [proposed-design.png](../../ui-context/screens/01-inicio/proposed-design.png)
+- Casos de prueba de diseño: [test-cases.md](../../ui-context/screens/01-inicio/test-cases.md)
+
 | Campo | Valor |
 | --- | --- |
 | Estado | Lista para diseñar |
-| Requerimientos | SUI-01, SUI-02, SUI-08, PRG-02. Indicador de sesión: INT-01 e INT-02, condicionado a P-18 |
+| Requerimientos | SUI-01, SUI-02, SUI-08, PRG-02, FR-029. Indicador de sesión y ranking: INT-01 e INT-02 |
 | Se llega desde | Apertura de la app, "volver al menú" desde cualquier pantalla, login o registro exitosos |
 | Lleva a | Partida (Lines, Merge), Selección de niveles (Fit, Sort), Ajustes, Login |
 
@@ -17,10 +23,16 @@ Es la primera pantalla. Presenta la suite y deja elegir una de las variantes. Ta
 | --- | --- | --- | --- | --- | --- |
 | INI-01 | Nombre de la suite | Texto o logotipo | Sí (SUI-01) | `app.title` | Siempre visible |
 | INI-02 | Acceso a ajustes | Botón con icono | Sí (SUI-01) | `home.settings` (etiqueta de accesibilidad) | Abre Ajustes. Siempre en la misma posición |
-| INI-03 | Selector de juego | Rueda hexagonal rotatoria | Sí (SUI-01) | — | Rueda con estética hexagonal inspirada en dial mecánico/óptico. El modo seleccionado se ubica arriba (12:00) más grande y destacado; los demás modos se ubican en la rueda sin escoger. Girar la rueda o tocar un icono rota el modo a la posición superior activa. |
+| INI-03 | Selector de juego | Rueda hexagonal rotatoria | Sí (SUI-01) | — | Rueda con estética hexagonal inspirada en dial mecánico/óptico. El modo seleccionado se ubica arriba (12:00), más grande y destacado. Girar la rueda o tocar un icono anima la rueda hasta ubicar el modo activo arriba. |
+| INI-03a | Vista previa central | Panel visual dinámico | Sí | — | Carga una vista previa del modo seleccionado en el centro de la rueda. |
 | INI-04 | Detalle del juego seleccionado | Panel/ficha con acción principal | Sí | `game.<id>.name`, `game.<id>.desc` | Muestra el nombre del modo seleccionado, etiqueta de tipo (`partida_directa` o `por_niveles`), descripción corta, chip de progreso (INI-05) y botón principal para jugar. |
 | INI-05 | Resumen de progreso | Texto | Sí (PRG-02) | `common.best_value`, `common.best_none`, `common.levels_progress` | Según el tipo de juego, ver tabla siguiente |
-| INI-06 | Indicador de sesión | Botón o etiqueta | Condicionado a P-18 | `common.sign_in`, `home.session_user` | Sin sesión: abre Login. Con sesión: muestra el nombre de usuario |
+| INI-06 | Indicador de sesión y ranking | Botón o etiqueta | Sí (P-18) | `common.sign_in`, `home.session_user` | Sin sesión: abre Login. Con sesión: muestra el nombre de usuario y permite acceder al ranking. |
+| INI-07 | Vista previa central | Visual | Sí | `previewKey` del modo seleccionado | Carga el preview del modo activo en el centro de la rueda. |
+| INI-08 | Navegación inferior | Barra de navegación | Sí | `home.points`, `home.play`, `home.settings` | Presenta Puntos a la izquierda, Jugar como acción principal central y Ajustes a la derecha. La acción seleccionada usa icono filled; las demás usan icono outline. |
+| INI-08a | Acceso a puntos | Botón de navegación | Sí (FR-029) | `home.points` | Abre el ranking global. Sin sesión abre Login y al iniciar sesión continúa al ranking. |
+| INI-08b | Acción principal Jugar | Botón de navegación | Sí (FR-001) | `home.play` | Abre la acción principal del modo seleccionado mediante el destino definido por su tipo de entrada. |
+| INI-08c | Acceso a ajustes | Botón de navegación | Sí (SUI-01) | `home.settings` | Abre Ajustes. |
 
 ### Resumen de progreso por juego (PRG-02)
 
@@ -34,7 +46,9 @@ Es la primera pantalla. Presenta la suite y deja elegir una de las variantes. Ta
 ## Recibe
 
 - **Lista de juegos.** Por cada juego: identificador, nombre, descripción, imagen o icono, tipo (`partida_directa` o `por_niveles`) y resumen de progreso (valor y etiqueta).
-- **Sesión.** Ninguna, o el nombre de usuario. Solo si P-18 lo confirma.
+- **Sesión.** Ninguna, o el nombre de usuario. Sin sesión se ofrece Login; con sesión se ofrece acceso a ranking.
+- **Modo inicial.** Hexa Lines en el primer arranque. Después se conserva el último modo seleccionado.
+- **Preview.** Cada modo proporciona una clave `previewKey` para una imagen estática local. La imagen se resuelve desde `assets/ui/home-previews/`; no se usa el nombre del modo para elegir componentes.
 
 ### Datos de ejemplo
 
@@ -51,9 +65,10 @@ Para probar la extensibilidad, la pantalla debe mostrar una quinta tarjeta si se
 
 | Evento | Cuándo | Datos |
 | --- | --- | --- |
-| Juego elegido | El usuario toca una tarjeta | Identificador y tipo del juego |
+| Juego elegido | El usuario toca o gira hasta seleccionar un modo | Identificador y tipo del juego |
 | Abrir ajustes | Toca INI-02 | — |
 | Abrir login | Toca INI-06 sin sesión | — |
+| Abrir ranking | Toca INI-06 con sesión | — |
 
 ## Estados
 
@@ -64,6 +79,7 @@ Para probar la extensibilidad, la pantalla debe mostrar una quinta tarjeta si se
 | Cargando progreso | Instante inicial | Tarjetas visibles con el progreso en marcador de posición. No se bloquea la elección |
 | Error al leer progreso | Falla la lectura local | Tarjetas visibles sin resumen y el mensaje `home.error_progress`. No se bloquea la elección |
 | Sin juegos | La lista llega vacía (caso técnico) | Mensaje `home.empty` |
+| Selección persistida | El jugador regresa a Inicio | Se selecciona el último modo jugado o elegido |
 
 ## Navegación
 
@@ -81,4 +97,5 @@ Para probar la extensibilidad, la pantalla debe mostrar una quinta tarjeta si se
 
 ## Preguntas abiertas
 
-- P-18: ¿se muestra el indicador de sesión y el acceso a ranking en esta pantalla?
+- P-18 resuelto: se muestra el indicador de sesión y el acceso a ranking.
+- P-17 pendiente: ajustar el diseño final de Ajustes no cambia el comportamiento obligatorio de Inicio.

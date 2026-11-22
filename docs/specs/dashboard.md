@@ -8,5 +8,7 @@ Progress is measured by behaviour that is specified, implemented and verified, n
 | UC-002 | FR-004, FR-005, FR-009, FR-015, FR-020 | Approved | ✕ | ✕ | ✕ | — | Reviewed |
 | UC-003 | FR-011, FR-023 | Approved | ✕ | ✕ | ✕ | — | Reviewed |
 | UC-004 | FR-012, FR-024, FR-026 | Approved | ✕ | ✕ | ✕ | — | Reviewed |
+| UC-005 | FR-001, FR-024, FR-026, FR-028, FR-029, C-002, C-004, C-008 | Approved | ✓ | ✓ | ✕ | — | Reviewed |
+| UC-006 | FR-001, FR-029, C-008 | Approved | ✕ | ✕ | ✕ | — | Ready for implementation |
 
 Status flow: Draft → Reviewed → Approved → Implemented → Verified → Deployed.
