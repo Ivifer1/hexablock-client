@@ -41,22 +41,22 @@ describe('HexTopology (Domain Service & Strategy)', () => {
       // Arrange
       const start = new HexCoord(1, 0); // East unit vector
 
-      // Act: 60° CW rotation: (q, r, s) -> (-s, -q, -r) = (q+r, -q)
-      const rotatedCW = topology.rotate60(start, 1);
-      const rotatedCCW = topology.rotate60(start, -1);
+      // Act: 60° CW rotation via general rotate and rotate60 alias
+      const rotatedCW = topology.rotate(start, 1);
+      const rotatedCWAlias = topology.rotate60(start, 1);
+      const rotatedCCW = topology.rotate(start, -1);
 
       // Assert
-      // (1, 0) rotated 60° CW should land on (1, -1) [Northeast] or (0, 1) [Southeast] depending on convention.
-      // Standard clockwise convention: (q, r) -> (q+r, -q) => (1+0, -1) = (1, -1) [Northeast]
       expect(rotatedCW.q).toBe(1);
       expect(rotatedCW.r).toBe(-1);
+      expect(rotatedCWAlias.equals(rotatedCW)).toBe(true);
 
       // 6 full 60° steps CW brings it back to start
-      const fullCircle = topology.rotate60(start, 6);
+      const fullCircle = topology.rotate(start, 6);
       expect(fullCircle.equals(start)).toBe(true);
 
       // 1 step CCW is 5 steps CW
-      expect(rotatedCCW.equals(topology.rotate60(start, 5))).toBe(true);
+      expect(rotatedCCW.equals(topology.rotate(start, 5))).toBe(true);
     });
 
     it('should_preserve_distance_to_origin_when_rotated', () => {

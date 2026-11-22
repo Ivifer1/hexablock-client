@@ -3,12 +3,12 @@ import { HexDirection, HexDirections } from './hex-direction';
 import { ITopology } from './itopology';
 
 /**
- * HexTopology (Domain Service & Strategy - DDD)
+ * HexTopology (Domain Service & Strategy - DDD & GoF)
  *
- * Implements ITopology<HexCoord> for mathematical calculations on a hexagonal grid.
+ * Implements ITopology<HexCoord, HexDirection> for mathematical calculations on a hexagonal grid.
  * Provides distance, neighbor queries, line projections, and 60-degree rotations.
  */
-export class HexTopology implements ITopology<HexCoord> {
+export class HexTopology implements ITopology<HexCoord, HexDirection> {
   /**
    * Returns all 6 immediate neighbors of a coordinate.
    */
@@ -59,7 +59,7 @@ export class HexTopology implements ITopology<HexCoord> {
    * Rotates a hexagonal coordinate around (0, 0) in steps of 60 degrees.
    * Positive steps rotate clockwise; negative steps rotate counter-clockwise.
    */
-  public rotate60(coord: HexCoord, steps: number): HexCoord {
+  public rotate(coord: HexCoord, steps: number): HexCoord {
     const normalizedSteps = ((steps % 6) + 6) % 6;
     let { q, r } = coord;
 
@@ -72,5 +72,12 @@ export class HexTopology implements ITopology<HexCoord> {
     }
 
     return new HexCoord(q, r);
+  }
+
+  /**
+   * Convenience alias for hexagonal 60° rotation.
+   */
+  public rotate60(coord: HexCoord, steps: number): HexCoord {
+    return this.rotate(coord, steps);
   }
 }

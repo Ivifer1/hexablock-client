@@ -1,17 +1,45 @@
 import { HexCoord } from './hex-coord';
 
 /**
+ * IBoardShape<TCoord> (Domain Abstraction - GoF & DDD)
+ *
+ * Generic interface representing the boundary and playable cell collection of ANY game board,
+ * completely independent of the underlying cell geometry (hexagonal, triangular, square).
+ */
+export interface IBoardShape<TCoord> {
+  /**
+   * Total number of playable cells defined on this board.
+   */
+  readonly cellCount: number;
+
+  /**
+   * Optional radial extent if the board is radially symmetric.
+   */
+  readonly radius?: number;
+
+  /**
+   * Checks whether a given coordinate is a valid playable cell.
+   */
+  contains(coord: TCoord | null | undefined): boolean;
+
+  /**
+   * Returns all valid playable coordinates as an array.
+   */
+  allCoords(): TCoord[];
+}
+
+/**
  * BoardShape (Value Object & Factory - DDD)
  *
- * Represents an immutable set of valid coordinates that define the boundary and playable
- * cells of a game board.
+ * Implements IBoardShape<HexCoord> representing an immutable set of valid coordinates
+ * that define the boundary and playable cells of a hexagonal board.
  *
  * Invariants:
  * - A hexagonal shape must have an integer radius >= 0.
  * - An arbitrary shape must contain at least one coordinate.
  * - Coordinates are deduplicated and immutable.
  */
-export class BoardShape {
+export class BoardShape implements IBoardShape<HexCoord> {
   private readonly _coordsByKey: ReadonlyMap<string, HexCoord>;
   private readonly _coordsList: readonly HexCoord[];
   public readonly radius?: number;
