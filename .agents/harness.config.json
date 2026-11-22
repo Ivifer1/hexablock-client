@@ -1,0 +1,7 @@
+{
+  "hooks": {
+    "preToolUse": {
+      "command": "node .agents/hooks/guard-git.mjs"
+    }
+  }
+}

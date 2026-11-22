@@ -4,3 +4,5 @@ Para reglas de adaptadores, ver `.agents/rules/adapters.md`.
 
 # Principios de Diseño
 - Todo el código debe seguir la guía en `.agents/rules/solid.md`.
+
+Reglas del proyecto: `.agents/rules/solid.md` y `.agents/rules/ui-architecture.md`.
