@@ -27,6 +27,7 @@ Inner layers also avoid structural coupling in their names: ports and methods st
 
 - [UI-decoupled architecture strategy](docs/plan_de_estrategia_de_arquitectura.md)
 - [Screen specifications](docs/ui-context/00-indice.md)
+- [Team work plan and ownership](docs/team-work-plan.md)
 
 ## Generic Engine
 
