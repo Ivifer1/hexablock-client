@@ -25,7 +25,7 @@ const isPush = has(/(^|[;&|(\n]\s*)(\w+=\S*\s+)*git(\s+-c\s+\S+)*\s+push\b/);
 // 1. Agents never change identity or global configuration.
 if (has(/git\s+config\b[^\n;&|]*(--global|--system|user\.(name|email)|core\.sshCommand|credential\.)/)) {
   denyTool(
-    'Git identity and global configuration are owned by the human. Do not run `git config` for user.*, core.sshCommand, credentials or --global. ' +
+    'Blocked because Git identity and global configuration are owned by the human. Do not run `git config` for user.*, core.sshCommand, credentials or --global. ' +
       'If the identity is wrong, stop and tell the human (see .claude/settings.local.json).',
   );
 }
@@ -116,6 +116,8 @@ if (isPush) {
 if (has(/\bgh\s+pr\s+merge\b/)) askHuman('Merging a pull request is a human decision after review and green CI.');
 
 if (problems.length) {
-  denyTool(`Blocked by the team's Git rules:\n- ${problems.join('\n- ')}`);
+  denyTool(
+    `Blocked because this Git command violates the team's Git rules. Specific reason(s):\n- ${problems.join('\n- ')}`,
+  );
 }
 process.exit(0);
