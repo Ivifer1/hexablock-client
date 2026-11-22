@@ -1,8 +1,18 @@
-# Contexto de Arquitectura
-Para reglas de dominio, ver `.agents/rules/domain.md`.
-Para reglas de adaptadores, ver `.agents/rules/adapters.md`.
+# Instructions for GitHub Copilot
 
-# Principios de Diseño
-- Todo el código debe seguir la guía en `.agents/rules/solid.md`.
+Please strictly follow the workspace rules, architectural patterns, and coding guidelines defined in the central `.agents/` directory:
 
-Reglas del proyecto: `.agents/rules/solid.md` y `.agents/rules/ui-architecture.md`.
+- **Project Brief & Workflow:** Refer to `.agents/rules/project-overview.md`
+- **Architecture & SOLID:** Refer to `.agents/rules/architecture.md` and `.agents/rules/solid.md`
+- **Code Style & Conventions:** Refer to `.agents/rules/code-style.md`
+- **Domain Rules:** Refer to `.agents/rules/domain.md`
+- **Adapter Rules:** Refer to `.agents/rules/adapters.md`
+- **UI Architecture:** Refer to `.agents/rules/ui-architecture.md`
+- **Agent Workflows & Roles:** Refer to `.agents/harness.config.json`
+
+# Architecture Context
+- For domain rules, refer to `.agents/rules/domain.md`.
+- For adapter rules, refer to `.agents/rules/adapters.md`.
+
+# Design Principles
+- All code must adhere to the design guidelines in `.agents/rules/solid.md` and `.agents/rules/project-overview.md`.
