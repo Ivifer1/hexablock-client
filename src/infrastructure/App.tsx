@@ -1,10 +1,14 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
+import { CompositionRoot } from './CompositionRoot';
+
+const compositionRoot = new CompositionRoot();
 
 export default function App() {
   return (
     <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
+      <Text>HexaBlock</Text>
+      <Text>{compositionRoot.modeRegistry.findAll().length} game modes available</Text>
       <StatusBar style="auto" />
     </View>
   );

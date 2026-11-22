@@ -1,6 +1,6 @@
 # Change record: feat/phase-1-composition-root
 
-Status: PROPOSED
+Status: APPROVED
 <!-- Only a human changes this line to "Status: APPROVED" (hooks block the agent from doing it). -->
 Author(s): Leoibarrapp with Copilot
 Date: 2026-11-22
@@ -67,10 +67,23 @@ An immediate implementation of all four game factories was rejected because Fase
 - Should an unknown mode lookup return `undefined` or an explicit application error result?
 
 ## Implementation notes
-_(pending approval)_
+Implemented the Fase 1 skeleton without introducing gameplay rules or concrete variants:
+
+- Added the application-level `GameModeDescriptor` and `IGameModeRegistry` contracts.
+- Added `GameModeRegistry` and `OutputStateStore` in the adapters layer.
+- Added `CompositionRoot` as the infrastructure assembly boundary and wired it into `App`.
+- Kept the registry empty until Fase 4 defines the concrete mode factories; the UI renders a neutral zero-mode state.
+- No domain files or Fase 0 DTO/ports were changed.
 
 ## Verification
-_(pending approval)_
+- `npm run typecheck` — passed.
+- `npm run lint` — passed.
+- `npm test -- --runInBand` — passed, 3 suites and 21 tests.
+- Targeted phase tests — passed, 2 suites and 5 tests.
+- Dependency direction was preserved: application has no framework imports; adapters do not import infrastructure.
 
 ## AI usage
-_(pending approval)_
+- Tool: Copilot SDK in VS Code.
+- Prompt: implement and commit the architecture plan's Fase 1 on a new branch after human approval.
+- Produced: the proposal, application mode contracts, adapter registry/state store, composition root, focused tests, and documentation updates.
+- Team decision: human approval was required and recorded before editing `src/**`; no gameplay variant or engine behavior was invented.
