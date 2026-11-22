@@ -24,7 +24,9 @@
     "web": "expo start --web",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "jest"
+    "test": "jest",
+    "guard:edits": "node .agents/hooks/guard-edits.mjs",
+    "lint:edit": "node .agents/hooks/lint-on-edit.mjs"
   },
   "private": true,
   "jest": {

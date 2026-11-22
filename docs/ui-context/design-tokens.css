@@ -1,0 +1,150 @@
+/**
+ * HexaBlock Suite — Design System Tokens & CSS Variables
+ * Generado a partir de la especificación en Figma y docs/ui-context
+ * Compatible con temas claro (crema) y oscuro (obsidian)
+ */
+
+:root {
+  /* ==========================================================================
+     TIPOGRAFÍA (Inter Scale)
+     ========================================================================== */
+  --font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  --font-size-display: 32px;
+  --line-height-display: 40px;
+  --font-weight-display: 700;
+
+  --font-size-title-1: 24px;
+  --line-height-title-1: 32px;
+  --font-weight-title-1: 700;
+
+  --font-size-title-2: 20px;
+  --line-height-title-2: 28px;
+  --font-weight-title-2: 600;
+
+  --font-size-subtitle: 16px;
+  --line-height-subtitle: 24px;
+  --font-weight-subtitle: 600;
+
+  --font-size-body-lg: 16px;
+  --line-height-body-lg: 24px;
+  --font-weight-body-lg: 400;
+
+  --font-size-body: 14px;
+  --line-height-body: 20px;
+  --font-weight-body: 400;
+
+  --font-size-body-medium: 14px;
+  --line-height-body-medium: 20px;
+  --font-weight-body-medium: 500;
+
+  --font-size-caption: 12px;
+  --line-height-caption: 16px;
+  --font-weight-caption: 500;
+
+  --font-size-overline: 10px;
+  --line-height-overline: 14px;
+  --font-weight-overline: 700;
+  --letter-spacing-overline: 0.5px;
+
+  /* ==========================================================================
+     GEOMETRÍA Y BORDES (Border Radius & Widths)
+     ========================================================================== */
+  --radius-none: 0px;
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  --border-width-thin: 1px;
+  --border-width-thick: 2px;
+
+  /* ==========================================================================
+     ESPACIADO (Spacing Scale - Base 4px)
+     ========================================================================== */
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-5: 20px;
+  --spacing-6: 24px;
+  --spacing-8: 32px;
+  --spacing-10: 40px;
+  --spacing-12: 48px;
+
+  /* Dimensiones táctiles mínimas recomendadas */
+  --touch-target-min: 44px;
+
+  /* ==========================================================================
+     PALETA DE COLOR — MODO CLARO (BASE CREMA)
+     ========================================================================== */
+  --color-bg: #F6F4ED;              /* Crema suave cálido */
+  --color-surface: #FFFFFF;         /* Superficie elevada blanca */
+  --color-surface-subdued: #EAE6DB; /* Crema atenuado para bandejas y áreas de control */
+  --color-surface-hover: #DFD9CC;
+
+  --color-text-primary: #1E2229;   /* Grafito de alto contraste */
+  --color-text-secondary: #636A79; /* Pizarra medio para descripciones y metadatos */
+  --color-text-tertiary: #989EAC;  /* Gris atenuado */
+  --color-text-inverse: #FFFFFF;
+
+  --color-border-default: #DFD9CC; /* Borde sutil crema */
+  --color-border-strong: #BEB6A4;
+
+  --color-primary: #4F65F6;        /* Índigo vibrante */
+  --color-primary-hover: #3F53DC;
+  --color-primary-fg: #FFFFFF;
+
+  --color-success: #16A34A;        /* Verde victoria */
+  --color-danger: #DC2626;         /* Rojo derrota / alerta */
+  --color-warning: #D97706;        /* Ámbar aviso */
+
+  /* Colores identificativos de las 4 variantes de juego */
+  --color-game-lines: #0891B2;     /* Cyan / Hexa Lines */
+  --color-game-fit: #D97706;       /* Ámbar / Hexa Fit */
+  --color-game-sort: #7C3AED;      /* Violeta / Hexa Sort */
+  --color-game-merge: #059669;     /* Esmeralda / Hexa Merge */
+
+  /* Sombras y elevaciones */
+  --shadow-low: 0 2px 8px rgba(30, 34, 41, 0.06);
+  --shadow-medium: 0 8px 24px rgba(30, 34, 41, 0.12);
+  --shadow-glow-primary: 0 4px 16px rgba(79, 101, 246, 0.30);
+}
+
+/* ==========================================================================
+   PALETA DE COLOR — MODO OSCURO (OBSIDIAN / SLATE)
+   ========================================================================== */
+[data-theme='dark'],
+.theme-dark {
+  --color-bg: #151821;              /* Obsidian oscuro profundo */
+  --color-surface: #222634;         /* Pizarra azulada elevada */
+  --color-surface-subdued: #2C3144; /* Superficie atenuada */
+  --color-surface-hover: #373D54;
+
+  --color-text-primary: #F3F5F9;   /* Blanco suave de alto contraste */
+  --color-text-secondary: #8E96AA; /* Gris pizarra medio */
+  --color-text-tertiary: #656D82;
+  --color-text-inverse: #151821;
+
+  --color-border-default: #2F354A; /* Borde oscuro sutil */
+  --color-border-strong: #444C68;
+
+  --color-primary: #5D75F9;        /* Índigo / bígaro brillante */
+  --color-primary-hover: #4F67E8;
+  --color-primary-fg: #FFFFFF;
+
+  --color-success: #22C55E;
+  --color-danger: #EF4444;
+  --color-warning: #F59E0B;
+
+  --color-game-lines: #06B6D4;
+  --color-game-fit: #F59E0B;
+  --color-game-sort: #8B5CF6;
+  --color-game-merge: #10B981;
+
+  --shadow-low: 0 2px 8px rgba(0, 0, 0, 0.35);
+  --shadow-medium: 0 8px 24px rgba(0, 0, 0, 0.55);
+  --shadow-glow-primary: 0 4px 20px rgba(93, 117, 249, 0.45);
+}

@@ -25,7 +25,8 @@ The dependency rule is enforced by ESLint (`no-restricted-imports` in `eslint.co
 
 Inner layers also avoid structural coupling in their names: ports and methods state intent (`IProgressRepository.save`), never the mechanism (`postToApi`, `sendEmail`). Each layer folder has a README with its rules.
 
-Diagram: TBD (see `/docs`).
+- [UI-decoupled architecture strategy](docs/plan_de_estrategia_de_arquitectura.md)
+- [Screen specifications](docs/ui-context/00-indice.md)
 
 ## Generic Engine
 
