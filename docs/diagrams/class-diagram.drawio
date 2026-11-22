@@ -1029,19 +1029,19 @@
           <mxGeometry height="22" width="19" x="247" y="117" as="geometry" />
         </mxCell>
         <mxCell id="p6c7" parent="1" style="swimlane;fontStyle=3;childLayout=stackLayout;horizontal=1;startSize=44;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;whiteSpace=wrap;html=0;fillColor=#FFF2CC;swimlaneFillColor=#FFFFFF;strokeColor=#B7950B;fontSize=11;fontColor=#111111;" value="«interface, Strategy»&#xa;IGameRules" vertex="1">
-          <mxGeometry height="127" width="372" x="324" y="130" as="geometry" />
+          <mxGeometry height="142" width="410" x="324" y="130" as="geometry" />
         </mxCell>
-        <mxCell id="p6c8" parent="p6c7" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=5;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=nowrap;html=0;fontSize=11;fontColor=#111111;" value="+ isValid(state: TState, move: TMove): boolean&#xa;+ validMoves(state: TState): TMove[]&#xa;+ apply(state: TState, move: TMove): TState&#xa;+ resolve(state: TState): Resolution&lt;TState&gt;&#xa;+ evaluate(state: TState): GameStatus" vertex="1">
-          <mxGeometry height="83" width="372" y="44" as="geometry" />
+        <mxCell id="p6c8" parent="p6c7" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=5;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=nowrap;html=0;fontSize=11;fontColor=#111111;" value="+ isValidMove(state: TState, move: TMove): boolean&#xa;+ applyMove(state: TState, move: TMove): TState&#xa;+ resolve(state: TState): ResolutionResult&lt;TState&gt;&#xa;+ evaluateStatus(state: TState): GameStatus&#xa;+ hasValidMoves(state: TState): boolean" vertex="1">
+          <mxGeometry height="98" width="410" y="44" as="geometry" />
         </mxCell>
-        <mxCell id="p6c9" parent="1" style="rounded=0;whiteSpace=nowrap;html=0;dashed=1;fillColor=#FFFFFF;strokeColor=#333333;fontSize=9;fontColor=#111111;fontStyle=2;" value="TCell, TMove, TState" vertex="1">
-          <mxGeometry height="22" width="126" x="582" y="117" as="geometry" />
+        <mxCell id="p6c9" parent="1" style="rounded=0;whiteSpace=nowrap;html=0;dashed=1;fillColor=#FFFFFF;strokeColor=#333333;fontSize=9;fontColor=#111111;fontStyle=2;" value="TCell, TMove, TState extends BaseGameState&lt;TCell&gt;" vertex="1">
+          <mxGeometry height="22" width="280" x="450" y="107" as="geometry" />
         </mxCell>
-        <mxCell id="p6c10" parent="1" style="swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=44;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;whiteSpace=wrap;html=0;fillColor=#FFF2CC;swimlaneFillColor=#FFFFFF;strokeColor=#B7950B;fontSize=11;fontColor=#111111;dashed=1;dashPattern=5 3;" value="«valueObject»&#xa;Resolution" vertex="1">
-          <mxGeometry height="82" width="151" x="766" y="130" as="geometry" />
+        <mxCell id="p6c10" parent="1" style="swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=44;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;whiteSpace=wrap;html=0;fillColor=#FFF2CC;swimlaneFillColor=#FFFFFF;strokeColor=#B7950B;fontSize=11;fontColor=#111111;dashed=1;dashPattern=5 3;" value="«valueObject»&#xa;ResolutionResult" vertex="1">
+          <mxGeometry height="82" width="180" x="766" y="130" as="geometry" />
         </mxCell>
-        <mxCell id="p6c11" parent="p6c10" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=5;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=nowrap;html=0;fontSize=11;fontColor=#111111;" value="+ state: TState&#xa;+ events: GameEvent[]" vertex="1">
-          <mxGeometry height="38" width="151" y="44" as="geometry" />
+        <mxCell id="p6c11" parent="p6c10" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=5;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=nowrap;html=0;fontSize=11;fontColor=#111111;" value="+ nextState: TState&#xa;+ events: readonly GameEvent[]" vertex="1">
+          <mxGeometry height="38" width="180" y="44" as="geometry" />
         </mxCell>
         <mxCell id="p6c12" parent="1" style="rounded=0;whiteSpace=nowrap;html=0;dashed=1;fillColor=#FFFFFF;strokeColor=#333333;fontSize=9;fontColor=#111111;fontStyle=2;" value="TState" vertex="1">
           <mxGeometry height="22" width="47" x="882" y="117" as="geometry" />
@@ -1050,10 +1050,10 @@
           <mxGeometry height="44" width="91" x="987" y="130" as="geometry" />
         </mxCell>
         <mxCell id="p6c14" parent="1" style="swimlane;fontStyle=3;childLayout=stackLayout;horizontal=1;startSize=44;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;whiteSpace=wrap;html=0;fillColor=#FFF2CC;swimlaneFillColor=#FFFFFF;strokeColor=#B7950B;fontSize=11;fontColor=#111111;" value="«interface, Strategy»&#xa;IScoringPolicy" vertex="1">
-          <mxGeometry height="67" width="269" x="30" y="337" as="geometry" />
+          <mxGeometry height="82" width="380" x="30" y="337" as="geometry" />
         </mxCell>
-        <mxCell id="p6c15" parent="p6c14" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=5;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=nowrap;html=0;fontSize=11;fontColor=#111111;" value="+ scoreTurn(turn: Turn&lt;TState&gt;): Points" vertex="1">
-          <mxGeometry height="23" width="269" y="44" as="geometry" />
+        <mxCell id="p6c15" parent="p6c14" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=5;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=nowrap;html=0;fontSize=11;fontColor=#111111;" value="+ calculateTurnScore(context: TurnScoreContext&lt;TState&gt;): ScoreResult" vertex="1">
+          <mxGeometry height="38" width="380" y="44" as="geometry" />
         </mxCell>
         <mxCell id="p6c16" parent="1" style="rounded=0;whiteSpace=nowrap;html=0;dashed=1;fillColor=#FFFFFF;strokeColor=#333333;fontSize=9;fontColor=#111111;fontStyle=2;" value="TState" vertex="1">
           <mxGeometry height="22" width="47" x="256" y="324" as="geometry" />

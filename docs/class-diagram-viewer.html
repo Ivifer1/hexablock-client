@@ -145,29 +145,67 @@ classDiagram
     direction TB
     note "Capa 1: Motor Genérico y Reglas de Juego (GoF Strategy & Memento)"
 
+    class GameStatus {
+        &lt;&lt;Enum / Value Object&gt;&gt;
+        PLAYING
+        WON
+        LOST
+    }
+
+    class BaseGameState~TCell~ {
+        &lt;&lt;interface, Value Object&gt;&gt;
+        +board: HexBoard~TCell~
+        +score: number
+        +moveCount: number
+        +status: GameStatus
+    }
+
+    class GameEvent {
+        &lt;&lt;Domain Event&gt;&gt;
+        +type: string
+        +payload: Record
+    }
+
+    class ResolutionResult~TState~ {
+        &lt;&lt;Value Object&gt;&gt;
+        +nextState: TState
+        +events: GameEvent[]
+    }
+
+    class IGameRules~TCell, TMove, TState~ {
+        &lt;&lt;interface, Strategy&gt;&gt;
+        +isValidMove(state: TState, move: TMove) boolean
+        +applyMove(state: TState, move: TMove) TState
+        +resolve(state: TState) ResolutionResult~TState~
+        +evaluateStatus(state: TState) GameStatus
+        +hasValidMoves(state: TState) boolean
+    }
+
+    class IScoringPolicy~TState~ {
+        &lt;&lt;interface, Strategy&gt;&gt;
+        +calculateTurnScore(context: TurnScoreContext) ScoreResult
+    }
+
+    class ScoreResult {
+        &lt;&lt;Value Object&gt;&gt;
+        +pointsEarned: number
+        +newTotalScore: number
+        +multiplier: number
+        +starsEarned: number
+        +breakdown: Record
+    }
+
     class GameEngine~TCell, TMove, TState~ {
         &lt;&lt;Aggregate Root&gt;&gt;
         -rules: IGameRules~TCell, TMove, TState~
         -scoring: IScoringPolicy~TState~
         -pieceSource: IPieceSource~TPiece~
-        -board: HexBoard~TCell~
+        -state: TState
         -history: MoveHistory~TMove, TState~
-        +start(seed: Seed) void
+        +start(initial: TState) void
         +applyMove(move: TMove) MoveOutcome
         +undo() MoveOutcome
         +redo() MoveOutcome
-    }
-
-    class IGameRules~TCell, TMove, TState~ {
-        &lt;&lt;interface, Strategy&gt;&gt;
-        +validateMove(board, move, state) boolean
-        +applyMove(board, move, state) TState
-        +isGameOver(board, state) boolean
-    }
-
-    class IScoringPolicy~TState~ {
-        &lt;&lt;interface, Strategy&gt;&gt;
-        +calculateScore(stateTransition) number
     }
 
     class IPieceSource~TPiece~ {
@@ -184,11 +222,11 @@ classDiagram
         +redo() MoveCommand
     }
 
-    class HexBoard~TCell~ {
-        &lt;&lt;Aggregate Root&gt;&gt;
-    }
-
-    GameEngine o-- HexBoard : compone
+    BaseGameState o-- GameStatus : contiene
+    ResolutionResult o-- GameEvent : contiene
+    IGameRules ..> ResolutionResult : produce en resolve
+    IScoringPolicy ..> ScoreResult : produce
+    GameEngine o-- BaseGameState : gestiona
     GameEngine o-- IGameRules : estrategia reglas
     GameEngine o-- IScoringPolicy : estrategia puntaje
     GameEngine o-- IPieceSource : generador piezas
