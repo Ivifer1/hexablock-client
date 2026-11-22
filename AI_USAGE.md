@@ -2,17 +2,22 @@
 
 ## Tools
 
-TBD
+| Tool | Model | Role in Team Workflow |
+|---|---|---|
+| Antigravity (Google) | Gemini 3.8 Flash (High) | Co-developer & Engine Architect — harness hardening, domain modeling, TDD suite, code review |
+| Claude Code (Anthropic) | Claude 3.7 Sonnet | Initial scaffold, Phase 0-1 contracts and composition skeleton |
+| GitHub Copilot | GPT-4o / Claude 3.5 Sonnet | Inline completion and specification drafting |
 
 ## Task Log
 
-| Date | Task | Prompt | Result | Changes made |
-|------|------|--------|--------|--------------|
-| 2026-10-31 | Client project scaffold | "Set up the client: Expo + TypeScript, four Clean Architecture layers, a lint rule that blocks inner layers from importing outer layers, and CI" | Expo base project, `src/` layer folders with READMEs, ESLint `no-restricted-imports` rule per layer, architecture test, GitHub Actions workflow | Pending team review in the PR. Config passed to ESLint directly in the test so Jest does not need experimental flags; Node types kept out of `tsconfig` so `domain` cannot use Node APIs |
-| 2026-11-22 | Implement architecture plan Fase 1 | "Implement and commit Fase 1 on a new branch after approval" | Fase 1 composition skeleton, mode registry contracts, output state adapter, focused tests and verification | Human approval recorded in `feat__phase-1-composition-root.md`; no gameplay rules or concrete variants added |
-| 2026-11-22 | Propose Fase 2 use cases | "Start the proposals for Fase 2 on a new branch without implementing" | Four draft executable use cases covering game start, move application, history and progress | Open rules were left as explicit questions; no `src/**` files changed |
-| 2026-11-22 | Approve Fase 2 specs and design proposal | "Approve the use cases and start the Fase 2 design using the Figma design system and Inicio mockup" | UC-001 through UC-004 marked Approved, Fase 2 design record created, Inicio visual handoff mapped to local tokens | Figma MCP returned its Starter-plan call limit; no Figma-specific assets or components were invented |
-| 2026-11-22 | Assign repository work streams | "Divide the client work for Leonardo Ibarra (Frontend) and Sebastian Llambi (Engine), with Ivifer Pita documented as Backend" | Added a repository team plan with ownership boundaries, branches, handoffs and definition of done | Backend work remains in the separate backend repository; no client source code changed |
+| Date | Task | Prompt | Result | Team modifications & AI Anomalies Caught | Lessons learned |
+|---|---|---|---|---|---|
+| 2026-10-31 | Client project scaffold | "Set up the client: Expo + TypeScript, four Clean Architecture layers, a lint rule that blocks inner layers from importing outer layers, and CI" | Expo base project, `src/` layer folders with READMEs, ESLint `no-restricted-imports` rule per layer, architecture test, GitHub Actions workflow | Pending team review in the PR. Config passed to ESLint directly in the test so Jest does not need experimental flags; Node types kept out of `tsconfig` so `domain` cannot use Node APIs | Establish strict lint boundary tests before writing any domain code |
+| 2026-11-22 | Implement architecture plan Fase 1 | "Implement and commit Fase 1 on a new branch after approval" | Fase 1 composition skeleton, mode registry contracts, output state adapter, focused tests and verification | Human approval recorded in `feat__phase-1-composition-root.md`; no gameplay rules or concrete variants added | Maintain clean layer separation in composition root |
+| 2026-11-22 | Propose Fase 2 use cases | "Start the proposals for Fase 2 on a new branch without implementing" | Four draft executable use cases covering game start, move application, history and progress | Open rules were left as explicit questions; no `src/**` files changed | Spec first prevents premature implementation bugs |
+| 2026-11-22 | Approve Fase 2 specs and design proposal | "Approve the use cases and start the Fase 2 design using the Figma design system and Inicio mockup" | UC-001 through UC-004 marked Approved, Fase 2 design record created, Inicio visual handoff mapped to local tokens | Figma MCP returned its Starter-plan call limit; no Figma-specific assets or components were invented | Fall back gracefully to local CSS tokens when external API quotas are hit |
+| 2026-11-22 | Assign repository work streams | "Divide the client work for Leonardo Ibarra (Frontend) and Sebastian Llambi (Engine), with Ivifer Pita documented as Backend" | Added a repository team plan with ownership boundaries, branches, handoffs and definition of done | Backend work remains in the separate backend repository; no client source code changed | Clear ownership prevents team collision |
+| 2026-11-22 | Harness benchmark and 3-Gate quality protocol | "Analyze top reference repos (Arrow Maze, Nodus) and integrate their best practices into our harness" | 3-gate checklists (`pre_implementation`, `post_implementation`, `pre_commit`), testing architecture with In-Memory Fakes/State over Interaction, and pan/zoom class diagram viewer | Team identified that AI tended to jump directly to code without waiting for explicit design approval, and that deep mocks were brittle compared to In-Memory Fakes. Mandated explicit human gate before touching `src/**`. | Benchmarking against real semester winners reveals process gaps early |
 
 ## Critical Evaluation
 

@@ -21,15 +21,20 @@ Stack: Expo + React Native + TypeScript (strict), Jest (jest-expo), ESLint, Node
 6. **AOP without Libraries:** Cross-cutting concerns (logging, timing, errors) are implemented using Decorators/Proxies around use cases.
 7. **Testing Standards:** AAA pattern, named `should_<expected>_when_<condition>`. Engine is tested with fake cell types.
 8. **Git Workflow:** Feature branch per change, Conventional Commits in English, PR to `main`.
-9. **AI Transparency:** Record contributions in change records + `AI_USAGE.md`.
+9. **AI Transparency & Anomaly Tracking:** Record all AI contributions in change records and `AI_USAGE.md`. Every entry MUST document any incorrect suggestions, antipatterns, or bugs proposed by the AI and how the team caught and corrected them.
+10. **Three-Gate Quality Checklists:** Strict adherence to `.agents/checklists/`:
+    - Gate 1: `pre_implementation.md` (Design proposal approved by human BEFORE editing `src/**`).
+    - Gate 2: `post_implementation.md` (Clean Architecture isolation, SOLID, GoF, and tests pass).
+    - Gate 3: `pre_commit.md` (Documentation updated, AI_USAGE with anomalies logged, Conventional Commits).
 
 ## Workflow Steps
 1. **Spec:** Behaviour lives in `docs/specs/` (`FR/NFR/C-###`, use cases `UC-###`).
-2. **Design Proposal:** Copy `docs/ai/change-records/TEMPLATE.md` to `docs/ai/change-records/<branch>.md`. Set `Status: PROPOSED`.
-3. **Tests First:** Write tests before implementation.
+2. **Design Proposal (Gate 1):** Copy `docs/ai/change-records/TEMPLATE.md` to `docs/ai/change-records/<branch>.md`. Set `Status: PROPOSED`. Stop and wait for human approval (`Status: APPROVED`).
+3. **Tests First:** Write tests before implementation using In-Memory Fakes and AAA.
 4. **Implement:** Smallest change satisfying the spec.
-5. **Verify:** Typecheck, lint, test execution, design review.
-6. **Explain:** End every code-changing turn with a Spanish explanation (`## Explicación del cambio`).
+5. **Verify (Gate 2):** Typecheck, lint, test execution, Clean Architecture layers review.
+6. **Audit & Commit (Gate 3):** Update change record, log AI usage with anomalies in `AI_USAGE.md`, then commit with Conventional Commits.
+7. **Explain:** End every code-changing turn with a Spanish explanation (`## Explicación del cambio`).
 
 ## Explanation Format (Spanish)
 End code modifications with `## Explicación del cambio` covering:

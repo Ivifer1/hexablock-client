@@ -11,9 +11,11 @@ paths:
 - Name: `should_<expected_result>_when_<condition>` (e.g. `should_clear_three_lines_when_piece_completes_all_axes`).
 - Structure: AAA with `// Arrange`, `// Act`, `// Assert` comments; one behaviour per test.
 - Test behaviour through public APIs, not private details; tests must survive refactors.
-- The generic engine is tested with a fake cell/move/state type (test double) to prove it does not depend on any variant.
+- State over Interaction: assertions check return values and state (`expect(result).toBe(...)`). Avoid `expect(mock).toHaveBeenCalledWith(...)` unless interaction is the primary observable behavior (e.g., AOP logging decorator).
+- In-Memory Fakes: implement hand-written in-memory fakes (e.g., `Map`-based `InMemoryProgressRepository`) rather than deep Jest mocks. Fakes must reset state between tests.
+- The generic engine is tested with a fake cell/move/state type (`FakeCell`, `FakeGameRules` test double) to prove it does not depend on any concrete variant.
+- Testing APIs / Object Mothers: encapsulate fixture setup in reusable helpers (`test/_support/`) so changes to constructors don't break dozens of tests.
 - Use seeded random sources and fake clocks; never real randomness, time or network.
-- Mocks/stubs/fakes replace ports (repositories, gateways). Prefer hand-written fakes over deep mocking.
 - Mandatory per variant: line clearing on the 3 axes (Lines), exact coverage (Fit), cascade transfer (Sort), merge on collision (Merge),
   game-over conditions, undo/redo where applicable.
 - Before accepting a test, prove it can fail: break the rule temporarily and see it go red.
