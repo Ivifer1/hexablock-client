@@ -8,7 +8,10 @@ Mobile app with four hex-grid puzzle variants (Hexa Lines, Hexa Fit, Hexa Sort, 
 
 ## Architecture
 
-TBD — Clean Architecture layers and diagram (see `/docs`).
+TBD — Clean Architecture implementation.
+
+- [UI-decoupled architecture strategy](docs/plan-estrategia-arquitectura.md)
+- [Screen specifications](docs/ui-context/00-indice.md)
 
 ## Generic Engine
 
