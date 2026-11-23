@@ -572,16 +572,16 @@
         <mxCell id="p3c14" parent="1" style="rounded=0;whiteSpace=nowrap;html=0;dashed=1;fillColor=#FFFFFF;strokeColor=#333333;fontSize=9;fontColor=#111111;fontStyle=2;" value="TCoord, TCell" vertex="1">
           <mxGeometry height="22" width="86" x="1497" y="117" as="geometry" />
         </mxCell>
-        <mxCell id="p3c15" parent="1" style="swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=44;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;whiteSpace=wrap;html=0;fillColor=#FFF2CC;swimlaneFillColor=#FFFFFF;strokeColor=#B7950B;fontSize=11;fontColor=#111111;" value="FixedPieceSource" vertex="1">
+        <mxCell id="p3c15" parent="1" style="swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=44;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;whiteSpace=wrap;html=0;fillColor=#FFF2CC;swimlaneFillColor=#FFFFFF;strokeColor=#B7950B;fontSize=11;fontColor=#111111;" value="PredefinedPieceSource" vertex="1">
           <mxGeometry height="128" width="181" x="30" y="338" as="geometry" />
         </mxCell>
-        <mxCell id="p3c16" parent="p3c15" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=5;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=nowrap;html=0;fontSize=11;fontColor=#111111;" value="- pieces: TPiece[]&#xa;- index: Index" vertex="1">
+        <mxCell id="p3c16" parent="p3c15" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=5;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=nowrap;html=0;fontSize=11;fontColor=#111111;" value="- pieces: readonly TPiece[]&#xa;- currentIndex: number" vertex="1">
           <mxGeometry height="38" width="181" y="44" as="geometry" />
         </mxCell>
         <mxCell id="p3c17" parent="p3c15" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=#B7950B;" value="" vertex="1">
           <mxGeometry height="8" width="181" y="82" as="geometry" />
         </mxCell>
-        <mxCell id="p3c18" parent="p3c15" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=5;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=nowrap;html=0;fontSize=11;fontColor=#111111;" value="+ hasNext(): boolean&#xa;+ next(): TPiece" vertex="1">
+        <mxCell id="p3c18" parent="p3c15" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=5;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=nowrap;html=0;fontSize=11;fontColor=#111111;" value="+ hasNext(): boolean&#xa;+ next(): TPiece&#xa;+ remainingCount: number" vertex="1">
           <mxGeometry height="38" width="181" y="90" as="geometry" />
         </mxCell>
         <mxCell id="p3c19" parent="1" style="rounded=0;whiteSpace=nowrap;html=0;dashed=1;fillColor=#FFFFFF;strokeColor=#333333;fontSize=9;fontColor=#111111;fontStyle=2;" value="TPiece" vertex="1">
@@ -599,7 +599,7 @@
         <mxCell id="p3c23" parent="1" style="swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=44;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;whiteSpace=wrap;html=0;fillColor=#FFF2CC;swimlaneFillColor=#FFFFFF;strokeColor=#B7950B;fontSize=11;fontColor=#111111;" value="RandomPieceSource" vertex="1">
           <mxGeometry height="128" width="188" x="627" y="338" as="geometry" />
         </mxCell>
-        <mxCell id="p3c24" parent="p3c23" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=5;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=nowrap;html=0;fontSize=11;fontColor=#111111;" value="- candidates: TPiece[]&#xa;- random: IRandom" vertex="1">
+        <mxCell id="p3c24" parent="p3c23" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=5;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=nowrap;html=0;fontSize=11;fontColor=#111111;" value="- candidates: readonly TPiece[]&#xa;- random: IRandom" vertex="1">
           <mxGeometry height="38" width="188" y="44" as="geometry" />
         </mxCell>
         <mxCell id="p3c25" parent="p3c23" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=#B7950B;" value="" vertex="1">
@@ -614,10 +614,10 @@
         <mxCell id="p3c28" parent="1" style="swimlane;fontStyle=3;childLayout=stackLayout;horizontal=1;startSize=44;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;whiteSpace=wrap;html=0;fillColor=#E1D5E7;swimlaneFillColor=#FFFFFF;strokeColor=#7E57A2;fontSize=11;fontColor=#111111;" value="«interface, output port»&#xa;IRandom" vertex="1">
           <mxGeometry height="97" width="282" x="915" y="338" as="geometry" />
         </mxCell>
-        <mxCell id="p3c29" parent="p3c28" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=5;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=nowrap;html=0;fontSize=11;fontColor=#111111;" value="+ nextIndex(bound: Count): Index&#xa;+ snapshot(): RandomPosition&#xa;+ restore(position: RandomPosition): void" vertex="1">
+        <mxCell id="p3c29" parent="p3c28" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=5;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=nowrap;html=0;fontSize=11;fontColor=#111111;" value="+ nextDouble(): number&#xa;+ nextIndex(bound: number): number&#xa;+ nextInt(min: number, max: number): number&#xa;+ snapshot(): number&#xa;+ restore(state: number): void" vertex="1">
           <mxGeometry height="53" width="282" y="44" as="geometry" />
         </mxCell>
-        <mxCell id="p3c30" parent="1" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#F2F2F2;strokeColor=#999999;dashed=1;fontSize=10;fontColor=#555555;fontStyle=2;" value="SeededRandom&#xa;(see tab C13)" vertex="1">
+        <mxCell id="p3c30" parent="1" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#F2F2F2;strokeColor=#999999;dashed=1;fontSize=10;fontColor=#555555;fontStyle=2;" value="SeededRandom&#xa;(src/domain/random/&#xa;Mulberry32 PRNG)" vertex="1">
           <mxGeometry height="44" width="97" x="1276" y="338" as="geometry" />
         </mxCell>
         <mxCell id="p3c31" parent="1" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#F2F2F2;strokeColor=#999999;dashed=1;fontSize=10;fontColor=#555555;fontStyle=2;" value="IBoardShape&#xa;(see tab C1)" vertex="1">

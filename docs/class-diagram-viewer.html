@@ -210,7 +210,47 @@ classDiagram
 
     class IPieceSource~TPiece~ {
         &lt;&lt;interface, Strategy&gt;&gt;
-        +nextPieces(count: number) TPiece[]
+        +hasNext() boolean
+        +next() TPiece
+    }
+
+    class RandomPieceSource~TPiece~ {
+        -candidates: readonly TPiece[]
+        -random: IRandom
+        +hasNext() boolean
+        +next() TPiece
+    }
+
+    class PredefinedPieceSource~TPiece~ {
+        -pieces: readonly TPiece[]
+        -currentIndex: number
+        +hasNext() boolean
+        +next() TPiece
+        +remainingCount number
+    }
+
+    class IRandom {
+        &lt;&lt;interface, Port&gt;&gt;
+        +nextDouble() number
+        +nextIndex(bound: number) number
+        +nextInt(min: number, max: number) number
+        +snapshot() number
+        +restore(state: number) void
+    }
+
+    class SeededRandom {
+        &lt;&lt;Domain Service, Mulberry32&gt;&gt;
+        -state: number
+        +nextDouble() number
+        +nextIndex(bound: number) number
+        +nextInt(min: number, max: number) number
+        +snapshot() number
+        +restore(state: number) void
+    }
+
+    class takeBatch {
+        &lt;&lt;Pure Domain Utility&gt;&gt;
+        +takeBatch(source, count) readonly TPiece[]
     }
 
     class MoveHistory~TMove, TState~ {
@@ -231,6 +271,11 @@ classDiagram
     GameEngine o-- IScoringPolicy : estrategia puntaje
     GameEngine o-- IPieceSource : generador piezas
     GameEngine o-- MoveHistory : historial undo/redo
+    RandomPieceSource ..|> IPieceSource : implementa
+    PredefinedPieceSource ..|> IPieceSource : implementa
+    RandomPieceSource o-- IRandom : consume
+    SeededRandom ..|> IRandom : implementa
+    takeBatch ..> IPieceSource : consume lote (SRP/ISP)
         </pre>
       </div>
 
