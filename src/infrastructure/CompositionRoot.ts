@@ -34,7 +34,7 @@ import type {
   ThemeMode,
 } from '../application/ports';
 import type { ScreenLoadState } from '../application/value-objects';
-import type { HomePreviewAsset } from './home-previews';
+import type { IHomePreview } from './home-previews';
 import type { GameModeRegistration } from './homeModeRegistrations';
 import { HOME_TEXT_CATALOG } from './i18n/homeTranslations';
 import type { ModeIconComponent } from './mode-icons';
@@ -60,7 +60,7 @@ function isModeRegistration(
 export class CompositionRoot {
   public readonly modeRegistry: IGameModeRegistry;
   public readonly modeIconResolver: IAssetResolver<ModeIconComponent>;
-  public readonly previewAssetResolver: IAssetResolver<HomePreviewAsset>;
+  public readonly previewAssetResolver: IAssetResolver<IHomePreview>;
   public readonly homeOutput: HomeOutputStore;
   public readonly hudOutput: GameHudOutputStore;
   public readonly controlsOutput: GameControlsOutputStore;
@@ -84,7 +84,7 @@ export class CompositionRoot {
   ) {
     const descriptors: GameModeDescriptor[] = [];
     const iconEntries: Record<string, ModeIconComponent> = {};
-    const previewEntries: Record<string, HomePreviewAsset> = {};
+    const previewEntries: Record<string, IHomePreview> = {};
 
     for (const entry of modes) {
       if (isModeRegistration(entry)) {

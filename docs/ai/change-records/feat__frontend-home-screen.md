@@ -89,7 +89,7 @@ seam that renders registered modes and routes by entry kind without variant bran
 | 360 px English | `should_remain_readable_when_viewport_is_360_px_in_english` | UI |
 
 ## Open questions for the team
-- Exact preview artwork for each Variant.
+- Future polish (all modes): Current SVG previews (notably Hexa Merge and Hexa Sort, whose tiles overflow the background hex cells) are temporary placeholders. Once each game mode is implemented and playable, capture real in-game screenshots for all modes and wire them as static image assets via `ImageHomePreview` (implementing `IHomePreview`) in `DEFAULT_HOME_MODE_REGISTRATIONS`.
 
 ## Implementation notes
 - Added `HomeViewDTO`, `HomeModeDTO`, `HomeProgressDTO` and `IHomeOutputPort` in application.
@@ -112,10 +112,14 @@ seam that renders registered modes and routes by entry kind without variant bran
 - Extracted cross-screen theme state into `IThemeController` / `IThemePreference` (`ThemeController` + `InMemoryThemePreference`) provided as a single-scope instance by `CompositionRoot`, composed into `HomeController` and subscribed by `useTheme(themeController)` so Inicio, future `SettingsController`, and other screens stay synchronized.
 - Removed the theme toggle button from `HomeHeader` (and `toggleTheme()` from `IHomeController` / `HomeController`) while keeping `CompositionRoot.themeController` + `useTheme(themeController)` reactive to external theme changes, and extended the header `INI-06` session button into a horizontal primary pill showing both `SessionActionIcon` and visible `sessionLabel`.
 - Standardized common button size tokens (`BUTTON_SIZES` for `s`, `m`, `l` and `scaleButtonSize` in `src/infrastructure/theme/tokens.ts`), applying `s` to `HomeHeader`'s session button and `l` to `HomeModeCard`'s primary play CTA.
+- Redesigned Inicio to match the vertical showcase layout while preserving `LIGHT_THEME` / `DARK_THEME` and size tokens: standalone brand mark + outlined `s` session pill in `HomeHeader`, subtle floating hex background (`HomeAtmosphere`), split `HexaBlock\nSuite` hero + updated subtitle, centered glowing rounded-hex preview showcase with left/right chevron controls and horizontal swipe (`HexShowcaseFrame`), floating selected-mode pill with fixed two-line description and compact entry-kind/progress badges (`HomeModeCard`), horizontal row of rounded-square mode tiles (`ModeSelectorTile` in `HexModeSelector`) ordered `lines`, `merge`, `sort`, `fit`, full-width `l` Play CTA (`home.play_now`), and `HomeBottomMenu`. Replaced `WheelModeSlot.tsx` and upgraded `assets/ui/home-previews/*.svg` + `previewSources.ts` with 3D-beveled hexagonal board artwork.
+- Refactored home preview rendering from a `kind: 'svg' | 'image'` discriminated union (`HomePreviewAsset`) to a polymorphic `IHomePreview` Strategy interface (`SvgHomePreview`, `ImageHomePreview`) so `HomePreviewVisual` delegates directly without format conditionals and future preview formats (e.g. GIF or video) can be added cleanly under OCP/LSP.
+- Extracted centralized `withAlpha` (`src/infrastructure/theme/colorUtils.ts`) and standardized `AppButton` + Strategy-driven `APP_BUTTON_VARIANTS` (`src/infrastructure/ui/`), reusing it for both the `s` `outline` session button in `HomeHeader` and the `l` `primary` CTA in `HomeScreen`.
+- Decoupled the remaining extensibility hotspots: added optional `shortNameKey` (`GameModeDescriptor` → `HomeModeDTO.shortName` in `HomePresenter`) with i18n keys (`game.*.short_name`) replacing regex prefix stripping in `HomeScreen`; added `CUSTOM` `I18nKeyDTO` progress support plus injectable `progressFormatters` (`src/infrastructure/home/progressFormatters.ts`) removing conditional formatting from `HomeModeCard`; and extracted generic `BottomNavBar` (`src/infrastructure/ui/BottomNavBar.tsx`) composed by `HomeBottomMenu`.
 
 ## Verification
-- `npm run check:solid` (`npm run lint && npm run typecheck && npm run test:arch`): passed with 0 ESLint errors/warnings, clean `tsc --noEmit`, and 3/3 architecture/LSP/OCP suites (53 tests) green.
-- `npm test -- --runInBand`: 10/10 Jest suites (114 tests) passed, including `test/adapters/home-presentation.test.ts` and `test/infrastructure/home-screen.test.tsx`.
+- `npm run check:solid` (`npm run lint && npm run typecheck && npm run test:arch`): passed with 0 ESLint errors/warnings, clean `tsc --noEmit`, and 3/3 architecture/LSP/OCP suites (55 tests) green.
+- `npm test -- --runInBand`: 13/13 Jest suites (146 tests) passed, including `test/adapters/home-presentation.test.ts`, `test/infrastructure/home-layout.test.ts`, `test/infrastructure/menu-icons.test.ts`, `test/infrastructure/home-previews.test.tsx`, `test/infrastructure/app-button.test.tsx`, `test/infrastructure/home-extensibility.test.tsx`, and `test/infrastructure/home-screen.test.tsx`.
 - Initial fail check: the home presentation test suite failed before `HomePresenter` and `HomeController` existed, and the new UI/adapter tests failed before implementing `StaticAssetResolver`, `DefaultHomeProgressProvider`, `InMemoryHomeSessionReader`, and `homeModeRegistrations`.
 
 ## AI usage

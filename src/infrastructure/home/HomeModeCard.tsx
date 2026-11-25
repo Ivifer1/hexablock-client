@@ -1,14 +1,19 @@
 import { useMemo } from 'react';
-import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
-import type { ITextCatalog, SupportedLocale } from '../../application/ports';
-import type { HomeProgressDTO, I18nKeyDTO } from '../../application/value-objects';
+import { Animated, StyleSheet, Text, View } from 'react-native';
+import type { IAssetResolver, ITextCatalog, SupportedLocale } from '../../application/ports';
+import type { I18nKeyDTO } from '../../application/value-objects';
 import type { HomeLayoutMetrics } from '../homeLayout';
-import type { ExtendedHomeModeDTO } from '../HexModeSelector';
-import { BORDER_WIDTH, RADIUS, SPACING, TYPOGRAPHY, scaleButtonSize, type Theme } from '../theme';
-import { PlayGlyphIcon } from '../ui-icons/MenuIcons';
+import type { ModeIconComponent } from '../mode-icons';
+import { BORDER_WIDTH, RADIUS, SPACING, TYPOGRAPHY, type Theme } from '../theme';
+import {
+  formatHomeProgress,
+  type HomeProgressFormatterMap,
+} from './progressFormatters';
+import { renderModeIcon, withAlpha, type ExtendedHomeModeDTO } from './shared';
 
 export interface HomeModeCardProps {
   readonly mode: ExtendedHomeModeDTO;
+  readonly shortLabel: string;
   readonly errorMessage: I18nKeyDTO | null;
   readonly cardOpacity: Animated.Value;
   readonly layout: HomeLayoutMetrics;
@@ -16,49 +21,13 @@ export interface HomeModeCardProps {
   readonly isDark: boolean;
   readonly textCatalog: ITextCatalog;
   readonly locale: SupportedLocale;
-  readonly onPlay: () => void;
-}
-
-function withAlpha(hex: string, alphaHex: string): string {
-  if (/^#[0-9A-Fa-f]{6}$/.test(hex)) return `${hex}${alphaHex}`;
-  return hex;
-}
-
-function formatProgressLabel(
-  progress: HomeProgressDTO,
-  textCatalog: ITextCatalog,
-  locale: SupportedLocale,
-): string | null {
-  if (progress.kind === 'LEVELS') {
-    return textCatalog.resolve(
-      {
-        key: 'common.levels_progress',
-        parameters: { done: progress.completed, total: progress.total },
-      },
-      locale,
-    );
-  }
-  if (progress.kind === 'BEST') {
-    const numberLocale = locale === 'es' ? 'es-ES' : 'en-US';
-    return textCatalog.resolve(
-      {
-        key: 'common.best_value',
-        parameters: { value: progress.value.toLocaleString(numberLocale) },
-      },
-      locale,
-    );
-  }
-  if (progress.kind === 'ERROR') {
-    return null;
-  }
-  if (progress.kind === 'LOADING') {
-    return '…';
-  }
-  return textCatalog.resolve('common.best_none', locale);
+  readonly modeIconResolver?: IAssetResolver<ModeIconComponent>;
+  readonly progressFormatters?: HomeProgressFormatterMap;
 }
 
 export function HomeModeCard({
   mode,
+  shortLabel,
   errorMessage,
   cardOpacity,
   layout,
@@ -66,90 +35,50 @@ export function HomeModeCard({
   isDark,
   textCatalog,
   locale,
-  onPlay,
+  modeIconResolver,
+  progressFormatters,
 }: HomeModeCardProps) {
   const styles = useMemo(() => createStyles(theme), [theme]);
-  const modeName = textCatalog.resolve(mode.name, locale);
   const entryKindLabel = textCatalog.resolve(mode.entryKindLabel, locale);
-  const progressLabel = formatProgressLabel(mode.progress, textCatalog, locale);
+  const progressLabel = formatHomeProgress(
+    mode.progress,
+    textCatalog,
+    locale,
+    progressFormatters,
+  );
   const resolvedError =
     errorMessage ?? (mode.progress.kind === 'ERROR' ? mode.progress.message : null);
-  const playLabel = textCatalog.resolve(
-    { key: 'home.play_mode', parameters: { name: modeName } },
-    locale,
-  );
-  const playButton = scaleButtonSize('l', layout.fontScale);
 
   return (
-    <Animated.View
-      style={[
-        styles.card,
-        layout.compact && styles.cardCompact,
-        {
-          padding: layout.cardPadding,
-          borderColor: withAlpha(theme.primary, isDark ? '40' : '28'),
-          opacity: cardOpacity,
-        },
-      ]}
-    >
+    <Animated.View style={[styles.container, { opacity: cardOpacity }]}>
       <View
+        testID="home-selected-mode-pill"
         style={[
-          styles.cardHeaderRow,
-          { minHeight: layout.cardHeaderMinHeight },
-        ]}
-      >
-        <Text
-          style={[
-            styles.cardTitle,
-            {
-              fontSize: layout.cardTitleFontSize,
-              lineHeight: layout.cardTitleLineHeight,
-            },
-          ]}
-          numberOfLines={1}
-        >
-          {modeName}
-        </Text>
-        {progressLabel ? (
-          <View
-            testID="home-progress-badge"
-            style={[
-              styles.progressBadge,
-              {
-                minHeight: layout.progressBadgeMinHeight,
-                justifyContent: 'center',
-                backgroundColor: withAlpha(theme.primary, isDark ? '33' : '1A'),
-              },
-            ]}
-          >
-            <Text
-              style={[
-                styles.progressBadgeText,
-                { color: theme.primary, fontSize: 12 * layout.fontScale },
-              ]}
-              numberOfLines={1}
-            >
-              {progressLabel}
-            </Text>
-          </View>
-        ) : null}
-      </View>
-
-      <View
-        testID="home-entry-kind-badge"
-        style={[
-          styles.entryKindBadge,
+          styles.modePill,
           {
-            backgroundColor: theme.surfaceSubdued,
+            minHeight: layout.modePillMinHeight,
             borderColor: theme.borderDefault,
           },
         ]}
       >
+        {renderModeIcon(
+          mode,
+          theme.primary,
+          Math.round(20 * layout.fontScale),
+          true,
+          modeIconResolver,
+        )}
         <Text
-          style={[styles.entryKindText, { fontSize: Math.round(11 * layout.fontScale) }]}
+          style={[
+            styles.modePillText,
+            {
+              fontSize: Math.round(16 * layout.fontScale),
+              lineHeight: Math.round(20 * layout.fontScale),
+            },
+          ]}
           numberOfLines={1}
         >
-          {entryKindLabel}
+          {shortLabel}
         </Text>
       </View>
 
@@ -168,95 +97,97 @@ export function HomeModeCard({
         {textCatalog.resolve(mode.description, locale)}
       </Text>
 
+      <View style={[styles.metadataRow, { minHeight: layout.metadataRowHeight }]}>
+        <View
+          testID="home-entry-kind-badge"
+          style={[
+            styles.entryKindBadge,
+            {
+              backgroundColor: theme.surfaceSubdued,
+              borderColor: theme.borderDefault,
+            },
+          ]}
+        >
+          <Text
+            style={[styles.entryKindText, { fontSize: Math.round(11 * layout.fontScale) }]}
+            numberOfLines={1}
+          >
+            {entryKindLabel}
+          </Text>
+        </View>
+
+        {progressLabel ? (
+          <View
+            testID="home-progress-badge"
+            style={[
+              styles.progressBadge,
+              {
+                minHeight: layout.progressBadgeMinHeight,
+                backgroundColor: withAlpha(theme.primary, isDark ? '2B' : '1A'),
+              },
+            ]}
+          >
+            <Text
+              style={[
+                styles.progressBadgeText,
+                { color: isDark ? theme.primaryHover : theme.primary, fontSize: 11 * layout.fontScale },
+              ]}
+              numberOfLines={1}
+            >
+              {progressLabel}
+            </Text>
+          </View>
+        ) : null}
+      </View>
+
       {resolvedError ? (
         <Text testID="home-progress-error" style={styles.errorHint}>
           {textCatalog.resolve(resolvedError, locale)}
         </Text>
       ) : null}
-
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={playLabel}
-        onPress={onPlay}
-        style={({ pressed }) => [
-          styles.playButton,
-          layout.compact && styles.playButtonCompact,
-          {
-            minHeight: playButton.minHeight,
-            paddingHorizontal: playButton.paddingHorizontal,
-            backgroundColor: theme.primary,
-            shadowColor: theme.primary,
-          },
-          pressed && styles.pressedScale,
-        ]}
-      >
-        <View
-          style={[
-            styles.playButtonContent,
-            {
-              gap: playButton.gap,
-              paddingVertical: playButton.paddingVertical,
-            },
-          ]}
-        >
-          <PlayGlyphIcon color={theme.primaryFg} size={playButton.iconSize} />
-          <Text
-            style={[
-              styles.playText,
-              {
-                fontSize: playButton.fontSize,
-                lineHeight: playButton.lineHeight,
-              },
-            ]}
-            numberOfLines={1}
-            ellipsizeMode="tail"
-          >
-            {playLabel}
-          </Text>
-        </View>
-      </Pressable>
     </Animated.View>
   );
 }
 
 function createStyles(theme: Theme) {
   return StyleSheet.create({
-    card: {
+    container: {
       width: '100%',
-      marginTop: SPACING.s3,
-      borderRadius: RADIUS.xl,
-      backgroundColor: theme.surface,
-      borderWidth: BORDER_WIDTH.thin,
-      ...theme.shadowMedium,
+      alignItems: 'center',
     },
-    cardCompact: { marginTop: SPACING.s2, padding: SPACING.s3 },
-    cardHeaderRow: {
+    modePill: {
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'space-between',
+      justifyContent: 'center',
       gap: SPACING.s2,
+      paddingHorizontal: SPACING.s5,
+      paddingVertical: SPACING.s1 + 2,
+      borderRadius: RADIUS.full,
+      backgroundColor: theme.surface,
+      borderWidth: BORDER_WIDTH.thin,
+      ...theme.shadowLow,
     },
-    cardTitle: {
-      fontWeight: '800',
+    modePillText: {
       color: theme.textPrimary,
-      flexShrink: 1,
+      fontWeight: '700',
       letterSpacing: -0.2,
     },
-    progressBadge: {
-      flexShrink: 1,
-      maxWidth: '48%',
-      borderRadius: RADIUS.full,
-      paddingHorizontal: SPACING.s3,
-      paddingVertical: SPACING.s1,
-      overflow: 'hidden',
+    description: {
+      marginTop: SPACING.s1,
+      color: theme.textSecondary,
+      textAlign: 'center',
+      paddingHorizontal: SPACING.s2,
     },
-    progressBadgeText: {
-      fontWeight: '700',
+    metadataRow: {
+      marginTop: SPACING.s1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      flexWrap: 'wrap',
+      gap: SPACING.s2,
     },
     entryKindBadge: {
-      alignSelf: 'flex-start',
-      marginTop: SPACING.s1,
-      paddingHorizontal: SPACING.s2,
+      paddingHorizontal: SPACING.s2 + 2,
       paddingVertical: 2,
       borderRadius: RADIUS.full,
       borderWidth: BORDER_WIDTH.thin,
@@ -265,41 +196,21 @@ function createStyles(theme: Theme) {
       color: theme.textSecondary,
       fontWeight: '600',
     },
-    description: {
-      marginTop: SPACING.s2,
-      color: theme.textSecondary,
+    progressBadge: {
+      borderRadius: RADIUS.full,
+      paddingHorizontal: SPACING.s3,
+      paddingVertical: 2,
+      justifyContent: 'center',
+    },
+    progressBadgeText: {
+      fontWeight: '700',
     },
     errorHint: {
-      marginTop: SPACING.s2,
+      marginTop: SPACING.s1,
       color: theme.danger,
       fontSize: TYPOGRAPHY.caption.fontSize,
       fontWeight: '600',
-    },
-    playButton: {
-      marginTop: SPACING.s4,
-      borderRadius: RADIUS.full,
-      alignItems: 'center',
-      justifyContent: 'center',
-      shadowOffset: { width: 0, height: 6 },
-      shadowOpacity: 0.35,
-      shadowRadius: 14,
-      elevation: 6,
-    },
-    playButtonCompact: {
-      marginTop: SPACING.s3,
-    },
-    pressedScale: {
-      opacity: 0.92,
-      transform: [{ scale: 0.97 }],
-    },
-    playButtonContent: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    playText: {
-      color: theme.primaryFg,
-      fontWeight: '700',
+      textAlign: 'center',
     },
   });
 }

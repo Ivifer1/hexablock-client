@@ -2,6 +2,7 @@ import { CompositionRoot } from '../../src/infrastructure/CompositionRoot';
 import type { GameModeDescriptor } from '../../src/application/modes';
 import type { HomeDestination, ThemeMode } from '../../src/application/ports';
 import { DEFAULT_HOME_MODE_REGISTRATIONS, type GameModeRegistration } from '../../src/infrastructure/homeModeRegistrations';
+import { SvgHomePreview } from '../../src/infrastructure/home-previews';
 import { BlockIcon } from '../../src/infrastructure/mode-icons';
 
 const descriptor: GameModeDescriptor = {
@@ -77,7 +78,7 @@ describe('CompositionRoot', () => {
         iconKey: 'hexa-fill-icon',
       },
       icon: BlockIcon,
-      preview: { kind: 'svg', xml: '<svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" /></svg>' },
+      preview: new SvgHomePreview('<svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" /></svg>'),
     };
 
     // Act

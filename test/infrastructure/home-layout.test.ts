@@ -24,7 +24,7 @@ describe('Home layout responsiveness and copy stability', () => {
     }
   });
 
-  it('should_fit_wheel_and_orbit_slots_without_horizontal_overflow_when_viewport_varies', () => {
+  it('should_fit_showcase_arrows_and_mode_tiles_without_horizontal_overflow_when_viewport_varies', () => {
     // Arrange
     const viewports = [
       { width: 320, height: 568 },
@@ -38,10 +38,13 @@ describe('Home layout responsiveness and copy stability', () => {
     // Act & Assert
     for (const { width, height } of viewports) {
       const metrics = computeHomeLayoutMetrics(width, height, 'web', 0);
-      const slotWidth = Math.max(metrics.selectedModeIconSize + 18, 78);
       const availableWidth = width - metrics.horizontalPadding * 2;
-      expect(0.82 * metrics.wheelSize + slotWidth).toBeLessThanOrEqual(availableWidth);
-      expect(metrics.selectorHeight).toBeGreaterThanOrEqual(metrics.wheelSize);
+      expect(metrics.showcaseSize).toBeGreaterThanOrEqual(104);
+      expect(
+        metrics.showcaseSize + metrics.arrowButtonSize * 2 + metrics.arrowGap * 2,
+      ).toBeLessThanOrEqual(availableWidth);
+      expect(4 * 44 + 3 * metrics.tileGap).toBeLessThanOrEqual(availableWidth);
+      expect(5 * 44 + 4 * metrics.tileGap).toBeLessThanOrEqual(availableWidth);
     }
   });
 
@@ -51,7 +54,7 @@ describe('Home layout responsiveness and copy stability', () => {
 
     // Assert
     expect(metrics.descriptionHeight).toBe(metrics.descriptionLineHeight * 2);
-    expect(metrics.cardHeaderMinHeight).toBeGreaterThanOrEqual(metrics.cardTitleLineHeight);
+    expect(metrics.modePillMinHeight).toBeGreaterThan(0);
     expect(metrics.playButtonMinHeight).toBeGreaterThanOrEqual(44);
   });
 

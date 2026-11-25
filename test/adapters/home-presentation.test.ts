@@ -605,4 +605,49 @@ describe('UC-005 & UC-006 Home presentation and navigation', () => {
     expect(themePreference.load()).toBe('light');
     expect(observed).toEqual(['dark', 'light']);
   });
+
+  it('should_present_short_name_key_when_descriptor_defines_short_name_key', () => {
+    // Arrange
+    const output = new HomeOutputStore();
+    const registry = new GameModeRegistry([
+      { ...modes[0], shortNameKey: 'game.lines.short_name' },
+      modes[1],
+    ]);
+    const presenter = new HomePresenter(output, registry);
+
+    // Act
+    presenter.present({ selectedModeId: 'lines', state: 'NORMAL' });
+
+    // Assert
+    expect(output.current?.modes[0]?.shortName).toEqual({ key: 'game.lines.short_name' });
+    expect(output.current?.modes[1]?.shortName).toBeUndefined();
+  });
+
+  it('should_support_custom_i18n_progress_dto_when_custom_progress_mapper_returns_custom_kind', () => {
+    // Arrange
+    const output = new HomeOutputStore();
+    const registry = new GameModeRegistry([
+      {
+        ...modes[0],
+        id: 'goals',
+        progressDescriptor: 'goals-summary',
+      },
+    ]);
+    const progressProvider = new DefaultHomeProgressProvider({
+      'goals-summary': () => ({
+        kind: 'CUSTOM',
+        label: { key: 'common.goals_progress', parameters: { done: 2, total: 5 } },
+      }),
+    });
+    const presenter = new HomePresenter(output, registry, progressProvider);
+
+    // Act
+    presenter.present({ selectedModeId: 'goals', state: 'NORMAL' });
+
+    // Assert
+    expect(output.current?.modes[0]?.progress).toEqual({
+      kind: 'CUSTOM',
+      label: { key: 'common.goals_progress', parameters: { done: 2, total: 5 } },
+    });
+  });
 });

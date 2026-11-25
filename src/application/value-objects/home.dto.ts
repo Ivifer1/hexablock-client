@@ -8,11 +8,13 @@ export type HomeProgressDTO =
   | { readonly kind: 'NONE' }
   | { readonly kind: 'BEST'; readonly value: number }
   | { readonly kind: 'LEVELS'; readonly completed: number; readonly total: number }
-  | { readonly kind: 'ERROR'; readonly message: I18nKeyDTO };
+  | { readonly kind: 'ERROR'; readonly message: I18nKeyDTO }
+  | { readonly kind: 'CUSTOM'; readonly label: I18nKeyDTO };
 
 export interface HomeModeDTO {
   readonly id: GameId;
   readonly name: I18nKeyDTO;
+  readonly shortName?: I18nKeyDTO;
   readonly description: I18nKeyDTO;
   readonly entryKind: GameEntryKind;
   readonly entryKindLabel: I18nKeyDTO;

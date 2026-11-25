@@ -11,6 +11,7 @@ import {
   type GameModeRegistration,
 } from '../../src/infrastructure/homeModeRegistrations';
 import { HOME_TEXT_CATALOG } from '../../src/infrastructure/i18n/homeTranslations';
+import { SvgHomePreview } from '../../src/infrastructure/home-previews';
 import { BlockIcon } from '../../src/infrastructure/mode-icons';
 import { BUTTON_SIZES, DARK_THEME, LIGHT_THEME } from '../../src/infrastructure/theme';
 
@@ -119,7 +120,7 @@ describe('HomeScreen UI (UC-005 & UC-006)', () => {
         controls: ['pause'],
       },
       icon: BlockIcon,
-      preview: { kind: 'svg', xml: '<svg data-preview="fill" />' },
+      preview: new SvgHomePreview('<svg data-preview="fill" />'),
     };
     const catalog = new StaticTextCatalog(
       {
@@ -179,12 +180,13 @@ describe('HomeScreen UI (UC-005 & UC-006)', () => {
 
   it('should_render_progress_placeholder_when_progress_is_loading', async () => {
     // Arrange & Act
-    const { getByText } = await renderHome({ state: 'LOADING' });
+    const { getByLabelText, getByText } = await renderHome({ state: 'LOADING' });
 
     // Assert
     await waitFor(() => {
       expect(getByText('…')).toBeTruthy();
-      expect(getByText('Jugar Hexa Lines')).toBeTruthy();
+      expect(getByText('Jugar ahora')).toBeTruthy();
+      expect(getByLabelText('Jugar Hexa Lines')).toBeTruthy();
     });
   });
 
@@ -264,7 +266,7 @@ describe('HomeScreen UI (UC-005 & UC-006)', () => {
     expect(hasScrollViewNode(toJSON())).toBe(false);
   });
 
-  it('should_render_integrated_mode_labels_on_wheel_slots_when_home_loads', async () => {
+  it('should_render_integrated_mode_labels_on_mode_tiles_when_home_loads', async () => {
     // Arrange & Act
     const { getByTestId } = await renderHome();
     const extractText = (node: ReturnType<typeof getByTestId>): string => {
@@ -279,10 +281,39 @@ describe('HomeScreen UI (UC-005 & UC-006)', () => {
     };
 
     // Assert
-    expect(extractText(getByTestId('wheel-mode-label-lines'))).toBe('LINES');
-    expect(extractText(getByTestId('wheel-mode-label-merge'))).toBe('MERGE');
-    expect(extractText(getByTestId('wheel-mode-label-fit'))).toBe('FIT');
-    expect(extractText(getByTestId('wheel-mode-label-sort'))).toBe('SORT');
+    expect(extractText(getByTestId('mode-tile-label-lines'))).toBe('Lines');
+    expect(extractText(getByTestId('mode-tile-label-merge'))).toBe('Merge');
+    expect(extractText(getByTestId('mode-tile-label-sort'))).toBe('Sort');
+    expect(extractText(getByTestId('mode-tile-label-fit'))).toBe('Fit');
+  });
+
+  it('should_cycle_modes_when_previous_and_next_arrows_are_pressed', async () => {
+    // Arrange
+    const { getByTestId, getByLabelText, getByText, rerenderLatest } = await renderHome();
+    const initialPreview = getByTestId('home-center-preview').props.accessibilityLabel;
+    expect(getByText('Partida directa')).toBeTruthy();
+
+    // Act: advance to Merge
+    await fireEvent.press(getByTestId('home-next-mode-button'));
+    await rerenderLatest();
+
+    // Assert Merge selected
+    await waitFor(() => {
+      expect(getByLabelText('Jugar Hexa Merge')).toBeTruthy();
+      expect(getByTestId('home-center-preview').props.accessibilityLabel).not.toBe(initialPreview);
+    });
+
+    // Act: step back to Lines, then wrap to Fit
+    await fireEvent.press(getByTestId('home-prev-mode-button'));
+    await rerenderLatest();
+    await fireEvent.press(getByTestId('home-prev-mode-button'));
+    await rerenderLatest();
+
+    // Assert Fit selected with levels metadata
+    await waitFor(() => {
+      expect(getByLabelText('Jugar Hexa Fit')).toBeTruthy();
+      expect(getByText('Por niveles')).toBeTruthy();
+    });
   });
 
   it('should_render_points_play_settings_and_block_unavailable_points_when_menu_is_used', async () => {
@@ -306,18 +337,20 @@ describe('HomeScreen UI (UC-005 & UC-006)', () => {
 
   it('should_switch_all_visible_texts_when_locale_changes_between_spanish_and_english', async () => {
     // Arrange
-    const { getByText, rerenderLatest } = await renderHome({ locale: 'es' });
-    expect(getByText('¿A qué jugamos hoy?')).toBeTruthy();
+    const { getByLabelText, getByText, rerenderLatest } = await renderHome({ locale: 'es' });
+    expect(getByText('Cuatro juegos. Una aventura mental.')).toBeTruthy();
     expect(getByText('Partida directa')).toBeTruthy();
+    expect(getByText('Jugar ahora')).toBeTruthy();
 
     // Act
     await rerenderLatest('en');
 
     // Assert
     await waitFor(() => {
-      expect(getByText('What shall we play today?')).toBeTruthy();
+      expect(getByText('Four games. One mental adventure.')).toBeTruthy();
       expect(getByText('Direct play')).toBeTruthy();
-      expect(getByText('Play Hexa Lines')).toBeTruthy();
+      expect(getByText('Play now')).toBeTruthy();
+      expect(getByLabelText('Play Hexa Lines')).toBeTruthy();
       expect(getByText('Sign in')).toBeTruthy();
       expect(getByText('Settings')).toBeTruthy();
       expect(getByText('Points')).toBeTruthy();

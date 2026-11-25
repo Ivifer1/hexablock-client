@@ -203,6 +203,15 @@ export function ThemeToggleIcon({
   return <SvgXml xml={buildThemeIconSvg(isDark, color, size)} width={size} height={size} />;
 }
 
+export function buildChevronIconSvg(
+  direction: 'left' | 'right',
+  color: string,
+  size: number,
+): string {
+  const path = direction === 'left' ? 'M14.5 6.5 9 12l5.5 5.5' : 'M9.5 6.5 15 12l-5.5 5.5';
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none"><path d="${path}" stroke="${color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+
 export function SessionActionIcon({
   hasSession,
   color,
@@ -213,4 +222,16 @@ export function SessionActionIcon({
   readonly size: number;
 }) {
   return <SvgXml xml={buildSessionIconSvg(hasSession, color, size)} width={size} height={size} />;
+}
+
+export function ChevronIcon({
+  direction,
+  color,
+  size,
+}: {
+  readonly direction: 'left' | 'right';
+  readonly color: string;
+  readonly size: number;
+}) {
+  return <SvgXml xml={buildChevronIconSvg(direction, color, size)} width={size} height={size} />;
 }

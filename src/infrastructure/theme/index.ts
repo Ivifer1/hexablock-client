@@ -1,3 +1,4 @@
+export { withAlpha } from './colorUtils';
 export { useTheme } from './useTheme';
 export {
   BORDER_WIDTH,
