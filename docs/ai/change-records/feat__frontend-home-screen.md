@@ -6,9 +6,9 @@ Author(s): Leonardo Ibarra with GitHub Copilot
 Date: 2026-11-22
 
 ## Spec and traceability
-- Use cases: UC-005
+- Use cases: UC-005, UC-006
 - Requirements: FR-001, FR-024, FR-026, FR-028, FR-029, C-002, C-004, C-008
-- Business rules covered: BR-005-1 through BR-005-15
+- Business rules covered: BR-005-1 through BR-005-15, BR-006-1 through BR-006-10
 
 ## Problem
 Inicio has a functional UI specification and a 360 px proposed design, but no approved
@@ -26,7 +26,11 @@ seam that renders registered modes and routes by entry kind without variant bran
 | `HomeScreen` | React Native component | infrastructure | Renders data and emits gestures through the controller |
 | `HexModeSelector` | React Native component | infrastructure | Renders the generic registered mode list without variant-specific layout branches |
 | `HomeSelectionPreference` | adapter or repository | adapters | Persists and restores the last selected Variant |
-| `PreviewAssetResolver` | adapter | adapters | Resolves `previewKey` to a local static image asset |
+| `IAssetResolver<TAsset>` / `StaticAssetResolver<TAsset>` | port / adapter | application / adapters | Resolves `previewKey` and `iconKey` to static infrastructure assets without variant conditionals |
+| `IHomeProgressProvider` / `DefaultHomeProgressProvider` | port / adapter | application / adapters | Resolves per-mode initial progress DTOs using descriptor metadata (`totalLevels`, `progressDescriptor`) |
+| `IHomeSessionReader` / `InMemoryHomeSessionReader` | port / adapter | application / adapters | Supplies authenticated/guest session snapshot for `INI-06` |
+| `GameModeRegistration` | registration table | infrastructure | Couples each variant `descriptor`, `icon`, and `preview` in one OCP entry point |
+| `HomeSessionBar` / `HomePreviewVisual` | React Native components | infrastructure | Render the session/ranking bar (`INI-06`) and dynamic center preview (`INI-03a`/`INI-07`) |
 | `GameModeRegistry` | existing adapter | adapters | Supplies registered variant descriptors |
 
 ## Clean Architecture
@@ -105,9 +109,9 @@ seam that renders registered modes and routes by entry kind without variant bran
 - Refactored layers and SOLID compliance: moved React Native theme to `src/infrastructure/theme/`, tightened ESLint (`src/adapters/**`, inner-layer purity, `no-console`, `instanceof`, SRP complexity/params/depth thresholds and `max-lines` warning), segregated `IGameModeCatalog` / `IGameModeRegistry` and output stores under `src/adapters/state/`, removed concrete variant unions/branches from DTOs/presenters/UI, isolated adapter wiring exclusively in `CompositionRoot.ts`, and added `test/architecture/solid-architecture.test.ts`, `test/architecture/lsp-contracts.test.ts`, `npm run check:solid`, and a single-job `concurrency`-enabled `.github/workflows/ci.yml` gate.
 
 ## Verification
-- `npm run check:solid` (`npm run lint && npm run typecheck && npm run test:arch`): passed with 0 ESLint errors/warnings and all architecture/LSP/OCP gates green.
-- `npm test`: all Jest suites passed.
-- Initial fail check: the home presentation test suite failed before `HomePresenter` and `HomeController` existed.
+- `npm run check:solid` (`npm run lint && npm run typecheck && npm run test:arch`): passed with 0 ESLint errors/warnings, clean `tsc --noEmit`, and 3/3 architecture/LSP/OCP suites (53 tests) green.
+- `npm test -- --runInBand`: 10/10 Jest suites (114 tests) passed, including `test/adapters/home-presentation.test.ts` and `test/infrastructure/home-screen.test.tsx`.
+- Initial fail check: the home presentation test suite failed before `HomePresenter` and `HomeController` existed, and the new UI/adapter tests failed before implementing `StaticAssetResolver`, `DefaultHomeProgressProvider`, `InMemoryHomeSessionReader`, and `homeModeRegistrations`.
 
 ## AI usage
 GitHub Copilot drafted UC-005, the documentation structure, the proposed design and the implementation.

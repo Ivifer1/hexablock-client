@@ -12,14 +12,21 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import type { IHomeController, ITextCatalog, SupportedLocale } from '../application/ports';
+import type {
+  IAssetResolver,
+  IHomeController,
+  ITextCatalog,
+  SupportedLocale,
+} from '../application/ports';
 import type { HomeModeDTO, HomeViewDTO } from '../application/value-objects';
 import { HexModeSelector, type ExtendedHomeModeDTO } from './HexModeSelector';
+import type { HomePreviewAsset } from './home-previews';
 import { HomeBottomMenu, type HomeMenuItemKey } from './home/HomeBottomMenu';
 import { HomeHeader } from './home/HomeHeader';
 import { HomeModeCard } from './home/HomeModeCard';
+import { HomeSessionBar } from './home/HomeSessionBar';
 import { computeHomeLayoutMetrics } from './homeLayout';
-import type { ModeIconCatalog } from './mode-icons';
+import type { ModeIconComponent } from './mode-icons';
 import { MOTION, RADIUS, SPACING, TYPOGRAPHY, useTheme, type Theme } from './theme';
 
 export type { ExtendedHomeModeDTO };
@@ -31,7 +38,8 @@ export interface HomeScreenProps {
   readonly controller: IHomeController;
   readonly textCatalog: ITextCatalog;
   readonly locale?: SupportedLocale;
-  readonly modeIcons?: ModeIconCatalog;
+  readonly modeIconResolver?: IAssetResolver<ModeIconComponent>;
+  readonly previewResolver?: IAssetResolver<HomePreviewAsset>;
 }
 
 function withAlpha(hex: string, alphaHex: string): string {
@@ -44,7 +52,8 @@ export function HomeScreen({
   controller,
   textCatalog,
   locale = 'es',
-  modeIcons,
+  modeIconResolver,
+  previewResolver,
 }: HomeScreenProps) {
   const { theme, isDark, toggleTheme } = useTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
@@ -198,7 +207,8 @@ export function HomeScreen({
                   theme={theme}
                   isDark={isDark}
                   reduceMotion={reduceMotion}
-                  modeIcons={modeIcons}
+                  modeIconResolver={modeIconResolver}
+                  previewResolver={previewResolver}
                   resolveModeName={(mode) => textCatalog.resolve(mode.name, locale)}
                   resolveShortLabel={(mode) =>
                     mode.shortName ??
@@ -221,11 +231,21 @@ export function HomeScreen({
                 ) : null}
               </>
             )}
+
+            <HomeSessionBar
+              label={textCatalog.resolve(view.sessionLabel, locale)}
+              hasSession={view.hasSession}
+              theme={theme}
+              isDark={isDark}
+              fontScale={layout.fontScale}
+              onPress={() => controller.openSession(view.hasSession)}
+            />
           </View>
         </ScrollView>
 
         <HomeBottomMenu
           selectedMenu={selectedMenu}
+          isPointsAvailable={view.isPointsAvailable}
           menuHeight={layout.menuHeight}
           bottomSafeInset={layout.bottomSafeInset}
           menuIconSize={layout.menuIconSize}
@@ -233,8 +253,13 @@ export function HomeScreen({
           textCatalog={textCatalog}
           locale={locale}
           onPressPoints={() => {
-            setSelectedMenu('POINTS');
-            controller.openPoints(view.hasSession);
+            const navigated = controller.openPoints(
+              view.hasSession,
+              view.isPointsAvailable,
+            );
+            if (navigated) {
+              setSelectedMenu('POINTS');
+            }
           }}
           onPressPlay={() => {
             setSelectedMenu('PLAY');

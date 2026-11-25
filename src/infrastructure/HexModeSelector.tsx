@@ -6,12 +6,14 @@ import {
   View,
   type GestureResponderEvent,
 } from 'react-native';
+import type { IAssetResolver } from '../application/ports';
+import { HomePreviewVisual, type HomePreviewAsset } from './home-previews';
 import {
   CentralIsoCube,
   WheelModeSlot,
   type ExtendedHomeModeDTO,
 } from './home/WheelModeSlot';
-import type { ModeIconCatalog } from './mode-icons';
+import type { ModeIconComponent } from './mode-icons';
 import { BORDER_WIDTH, RADIUS, SPACING, type Theme } from './theme';
 import {
   canonicalWheelDeg,
@@ -34,7 +36,8 @@ export interface HexModeSelectorProps {
   readonly theme: Theme;
   readonly isDark: boolean;
   readonly reduceMotion: boolean;
-  readonly modeIcons?: ModeIconCatalog;
+  readonly modeIconResolver?: IAssetResolver<ModeIconComponent>;
+  readonly previewResolver?: IAssetResolver<HomePreviewAsset>;
   readonly resolveModeName: (mode: ExtendedHomeModeDTO) => string;
   readonly resolveShortLabel: (mode: ExtendedHomeModeDTO) => string;
 }
@@ -59,7 +62,8 @@ export function HexModeSelector({
   theme,
   isDark,
   reduceMotion,
-  modeIcons,
+  modeIconResolver,
+  previewResolver,
   resolveModeName,
   resolveShortLabel,
 }: HexModeSelectorProps) {
@@ -255,6 +259,11 @@ export function HexModeSelector({
   });
 
   const totalModes = modes.length;
+  const selectedMode =
+    modes.find((mode) => mode.id === selectedId) ?? modes[0] ?? null;
+  const activePreview = selectedMode
+    ? (previewResolver?.resolve(selectedMode.previewKey) ?? null)
+    : null;
 
   return (
     <View
@@ -331,10 +340,18 @@ export function HexModeSelector({
           ]}
         >
           <Animated.View style={{ transform: [{ scale: corePulse }] }}>
-            <CentralIsoCube
-              color={theme.primary}
-              size={wheelSize * 0.26}
-            />
+            {activePreview ? (
+              <HomePreviewVisual
+                asset={activePreview}
+                size={wheelSize * 0.3}
+                testID="home-center-preview"
+              />
+            ) : (
+              <CentralIsoCube
+                color={theme.primary}
+                size={wheelSize * 0.26}
+              />
+            )}
           </Animated.View>
         </View>
 
@@ -419,7 +436,7 @@ export function HexModeSelector({
               theme={theme}
               isDark={isDark}
               reduceMotion={reduceMotion}
-              modeIcons={modeIcons}
+              modeIconResolver={modeIconResolver}
               modeName={resolveModeName(mode)}
               shortLabel={resolveShortLabel(mode)}
               onSelectMode={onSelectMode}

@@ -8,6 +8,7 @@ export interface GameModeDescriptor {
   readonly descriptionKey: string;
   readonly entryKind: GameEntryKind;
   readonly progressDescriptor: string;
+  readonly totalLevels?: number;
   readonly previewKey: string;
   /** Key resolved by the home icon catalog to an SVG (or image) component. */
   readonly iconKey: string;

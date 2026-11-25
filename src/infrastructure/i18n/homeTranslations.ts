@@ -3,15 +3,18 @@ import type { SupportedLocale } from '../../application/ports';
 export const HOME_TEXT_CATALOG: Readonly<
   Record<string, Readonly<Record<SupportedLocale, string>>>
 > = {
-  'app.title': { es: 'HexaBlock', en: 'HexaBlock' },
+  'app.title': { es: 'HexaBlock Suite', en: 'HexaBlock Suite' },
   'home.settings': { es: 'Ajustes', en: 'Settings' },
   'home.play': { es: 'Jugar', en: 'Play' },
   'home.points': { es: 'Puntos', en: 'Points' },
+  'home.session_user': { es: 'Hola, {name}', en: 'Hi, {name}' },
   'home.hero_title': { es: '¿A qué jugamos hoy?', en: 'What shall we play today?' },
   'home.hero_subtitle': {
     es: 'Cuatro formas de encontrar tu equilibrio.',
     en: 'Four ways to find your balance.',
   },
+  'home.entry_direct': { es: 'Partida directa', en: 'Direct play' },
+  'home.entry_levels': { es: 'Por niveles', en: 'Level mode' },
   'game.lines.name': { es: 'Hexa Lines', en: 'Hexa Lines' },
   'game.lines.desc': {
     es: 'Conecta líneas completas y despeja el tablero.',
@@ -34,20 +37,16 @@ export const HOME_TEXT_CATALOG: Readonly<
   },
   'common.sign_in': { es: 'Iniciar sesión', en: 'Sign in' },
   'common.best_none': { es: 'Sin récord aún', en: 'No best score yet' },
-  'common.best_value': { es: 'Mejor récord', en: 'Best score' },
+  'common.best_value': { es: 'Récord: {value}', en: 'Best: {value}' },
+  'common.levels_progress': {
+    es: 'Niveles: {done} de {total}',
+    en: 'Levels: {done} of {total}',
+  },
   'home.error_progress': {
     es: 'No se pudo cargar tu progreso',
-    en: "Couldn't load your progress",
+    en: "We couldn't load your progress",
   },
   'home.empty': { es: 'No hay juegos disponibles', en: 'No games available' },
-  'home.levels_progress': {
-    es: 'Niveles: {completed} de {total}',
-    en: 'Levels: {completed} of {total}',
-  },
-  'home.best_score_value': {
-    es: 'Mejor récord: {value} pts',
-    en: 'Best score: {value} pts',
-  },
   'home.play_mode': {
     es: 'Jugar {name}',
     en: 'Play {name}',

@@ -15,6 +15,7 @@ export interface HomeModeDTO {
   readonly name: I18nKeyDTO;
   readonly description: I18nKeyDTO;
   readonly entryKind: GameEntryKind;
+  readonly entryKindLabel: I18nKeyDTO;
   readonly progress: HomeProgressDTO;
   readonly previewKey: string;
   readonly iconKey: string;
@@ -33,4 +34,5 @@ export interface HomeViewDTO {
   readonly errorMessage: I18nKeyDTO | null;
   readonly sessionLabel: I18nKeyDTO;
   readonly hasSession: boolean;
+  readonly isPointsAvailable: boolean;
 }

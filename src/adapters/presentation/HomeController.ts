@@ -37,17 +37,24 @@ export class HomeController implements IHomeController {
   public play(modeId: GameId): void {
     const descriptor = this.catalog.findById(modeId);
     if (!descriptor) return;
-    const destination = ENTRY_DESTINATION_MAP[descriptor.entryKind];
-    if (destination) {
-      this.navigator.navigate(destination);
+    if (!Object.prototype.hasOwnProperty.call(ENTRY_DESTINATION_MAP, descriptor.entryKind)) {
+      return;
     }
+    const destination = ENTRY_DESTINATION_MAP[descriptor.entryKind];
+    this.navigator.navigate(destination);
   }
 
   public openSettings(): void {
     this.navigator.navigate('SETTINGS');
   }
 
-  public openPoints(hasSession: boolean): void {
+  public openPoints(hasSession: boolean, isAvailable = true): boolean {
+    if (!isAvailable) return false;
+    this.navigator.navigate(hasSession ? 'RANKING' : 'LOGIN');
+    return true;
+  }
+
+  public openSession(hasSession: boolean): void {
     this.navigator.navigate(hasSession ? 'RANKING' : 'LOGIN');
   }
 }

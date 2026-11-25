@@ -31,11 +31,13 @@ export function HomeHeader({
           <BlockIcon color="#13968A" size={brandSize} isSelected />
         </View>
         <Text
+          numberOfLines={1}
+          adjustsFontSizeToFit
           style={[
             styles.title,
             {
-              fontSize: 24 * fontScale,
-              lineHeight: 32 * fontScale,
+              fontSize: 22 * fontScale,
+              lineHeight: 30 * fontScale,
             },
           ]}
         >
@@ -73,11 +75,12 @@ function createStyles(theme: Theme) {
       alignItems: 'center',
       justifyContent: 'space-between',
     },
-    brand: { flexDirection: 'row', alignItems: 'center', gap: SPACING.s3 },
+    brand: { flexDirection: 'row', alignItems: 'center', gap: SPACING.s3, flexShrink: 1 },
     title: {
       fontWeight: '800',
       color: theme.textPrimary,
       letterSpacing: -0.3,
+      flexShrink: 1,
     },
     themeToggle: {
       width: SPACING.touchTargetMin,

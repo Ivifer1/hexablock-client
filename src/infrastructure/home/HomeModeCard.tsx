@@ -28,27 +28,28 @@ function formatProgressLabel(
   progress: HomeProgressDTO,
   textCatalog: ITextCatalog,
   locale: SupportedLocale,
-): string {
+): string | null {
   if (progress.kind === 'LEVELS') {
     return textCatalog.resolve(
       {
-        key: 'home.levels_progress',
-        parameters: { completed: progress.completed, total: progress.total },
+        key: 'common.levels_progress',
+        parameters: { done: progress.completed, total: progress.total },
       },
       locale,
     );
   }
   if (progress.kind === 'BEST') {
+    const numberLocale = locale === 'es' ? 'es-ES' : 'en-US';
     return textCatalog.resolve(
       {
-        key: 'home.best_score_value',
-        parameters: { value: progress.value.toLocaleString() },
+        key: 'common.best_value',
+        parameters: { value: progress.value.toLocaleString(numberLocale) },
       },
       locale,
     );
   }
   if (progress.kind === 'ERROR') {
-    return textCatalog.resolve(progress.message, locale);
+    return null;
   }
   if (progress.kind === 'LOADING') {
     return '…';
@@ -69,6 +70,10 @@ export function HomeModeCard({
 }: HomeModeCardProps) {
   const styles = useMemo(() => createStyles(theme), [theme]);
   const modeName = textCatalog.resolve(mode.name, locale);
+  const entryKindLabel = textCatalog.resolve(mode.entryKindLabel, locale);
+  const progressLabel = formatProgressLabel(mode.progress, textCatalog, locale);
+  const resolvedError =
+    errorMessage ?? (mode.progress.kind === 'ERROR' ? mode.progress.message : null);
   const playLabel = textCatalog.resolve(
     { key: 'home.play_mode', parameters: { name: modeName } },
     locale,
@@ -104,26 +109,47 @@ export function HomeModeCard({
         >
           {modeName}
         </Text>
-        <View
-          style={[
-            styles.progressBadge,
-            {
-              minHeight: layout.progressBadgeMinHeight,
-              justifyContent: 'center',
-              backgroundColor: withAlpha(theme.primary, isDark ? '33' : '1A'),
-            },
-          ]}
-        >
-          <Text
+        {progressLabel ? (
+          <View
+            testID="home-progress-badge"
             style={[
-              styles.progressBadgeText,
-              { color: theme.primary, fontSize: 12 * layout.fontScale },
+              styles.progressBadge,
+              {
+                minHeight: layout.progressBadgeMinHeight,
+                justifyContent: 'center',
+                backgroundColor: withAlpha(theme.primary, isDark ? '33' : '1A'),
+              },
             ]}
-            numberOfLines={1}
           >
-            {formatProgressLabel(mode.progress, textCatalog, locale)}
-          </Text>
-        </View>
+            <Text
+              style={[
+                styles.progressBadgeText,
+                { color: theme.primary, fontSize: 12 * layout.fontScale },
+              ]}
+              numberOfLines={1}
+            >
+              {progressLabel}
+            </Text>
+          </View>
+        ) : null}
+      </View>
+
+      <View
+        testID="home-entry-kind-badge"
+        style={[
+          styles.entryKindBadge,
+          {
+            backgroundColor: theme.surfaceSubdued,
+            borderColor: theme.borderDefault,
+          },
+        ]}
+      >
+        <Text
+          style={[styles.entryKindText, { fontSize: Math.round(11 * layout.fontScale) }]}
+          numberOfLines={1}
+        >
+          {entryKindLabel}
+        </Text>
       </View>
 
       <Text
@@ -141,9 +167,9 @@ export function HomeModeCard({
         {textCatalog.resolve(mode.description, locale)}
       </Text>
 
-      {errorMessage ? (
-        <Text style={styles.errorHint}>
-          {textCatalog.resolve(errorMessage, locale)}
+      {resolvedError ? (
+        <Text testID="home-progress-error" style={styles.errorHint}>
+          {textCatalog.resolve(resolvedError, locale)}
         </Text>
       ) : null}
 
@@ -210,6 +236,18 @@ function createStyles(theme: Theme) {
     },
     progressBadgeText: {
       fontWeight: '700',
+    },
+    entryKindBadge: {
+      alignSelf: 'flex-start',
+      marginTop: SPACING.s1,
+      paddingHorizontal: SPACING.s2,
+      paddingVertical: 2,
+      borderRadius: RADIUS.full,
+      borderWidth: BORDER_WIDTH.thin,
+    },
+    entryKindText: {
+      color: theme.textSecondary,
+      fontWeight: '600',
     },
     description: {
       marginTop: SPACING.s2,

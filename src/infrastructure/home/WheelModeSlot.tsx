@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Animated, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import type { IAssetResolver } from '../../application/ports';
 import type { HomeModeDTO } from '../../application/value-objects';
-import type { ModeIconCatalog } from '../mode-icons';
+import type { ModeIconComponent } from '../mode-icons';
 import { BORDER_WIDTH, RADIUS, SPACING, TYPOGRAPHY, type Theme } from '../theme';
 import { modeBaseAngleRad } from '../wheelMath';
 
@@ -21,9 +22,9 @@ function renderModeIcon(
   color: string,
   size: number,
   isSelected: boolean,
-  modeIcons: ModeIconCatalog | undefined,
+  modeIconResolver: IAssetResolver<ModeIconComponent> | undefined,
 ) {
-  const Icon = modeIcons?.[mode.iconKey];
+  const Icon = modeIconResolver?.resolve(mode.iconKey);
   if (Icon) {
     return <Icon color={color} size={size} isSelected={isSelected} />;
   }
@@ -81,7 +82,7 @@ export interface WheelModeSlotProps {
   readonly theme: Theme;
   readonly isDark: boolean;
   readonly reduceMotion: boolean;
-  readonly modeIcons?: ModeIconCatalog;
+  readonly modeIconResolver?: IAssetResolver<ModeIconComponent>;
   readonly modeName: string;
   readonly shortLabel: string;
   readonly onSelectMode: (mode: ExtendedHomeModeDTO) => void;
@@ -99,7 +100,7 @@ export function WheelModeSlot({
   theme,
   isDark,
   reduceMotion,
-  modeIcons,
+  modeIconResolver,
   modeName,
   shortLabel,
   onSelectMode,
@@ -189,7 +190,7 @@ export function WheelModeSlot({
               isSelected ? theme.primary : theme.textSecondary,
               selectedModeIconSize * 0.7,
               isSelected,
-              modeIcons,
+              modeIconResolver,
             )}
           </Animated.View>
           <View style={[slotStyles.slotLabelBand, { height: labelBand }]}>

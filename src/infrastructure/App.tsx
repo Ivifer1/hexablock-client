@@ -2,9 +2,8 @@ import { useEffect, useState } from 'react';
 import type { IHomeNavigationPort } from '../application/ports';
 import type { HomeViewDTO } from '../application/value-objects';
 import { CompositionRoot } from './CompositionRoot';
-import { DEFAULT_HOME_MODE_DESCRIPTORS } from './homeModeDescriptors';
+import { DEFAULT_HOME_MODE_REGISTRATIONS } from './homeModeRegistrations';
 import { HomeScreen } from './HomeScreen';
-import { modeIconCatalog } from './mode-icons';
 
 const homeNavigator: IHomeNavigationPort = {
   navigate: () => {
@@ -12,7 +11,7 @@ const homeNavigator: IHomeNavigationPort = {
   },
 };
 
-const compositionRoot = new CompositionRoot(DEFAULT_HOME_MODE_DESCRIPTORS, homeNavigator);
+const compositionRoot = new CompositionRoot(DEFAULT_HOME_MODE_REGISTRATIONS, homeNavigator);
 compositionRoot.initializeHome();
 
 export default function App() {
@@ -29,7 +28,8 @@ export default function App() {
       view={view}
       controller={compositionRoot.homeController}
       textCatalog={compositionRoot.textCatalog}
-      modeIcons={modeIconCatalog}
+      modeIconResolver={compositionRoot.modeIconResolver}
+      previewResolver={compositionRoot.previewAssetResolver}
     />
   );
 }

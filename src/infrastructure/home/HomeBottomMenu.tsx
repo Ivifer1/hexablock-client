@@ -12,6 +12,7 @@ export type HomeMenuItemKey = 'POINTS' | 'PLAY' | 'SETTINGS';
 
 export interface HomeBottomMenuProps {
   readonly selectedMenu: HomeMenuItemKey;
+  readonly isPointsAvailable?: boolean;
   readonly menuHeight: number;
   readonly bottomSafeInset: number;
   readonly menuIconSize: number;
@@ -25,6 +26,7 @@ export interface HomeBottomMenuProps {
 
 export function HomeBottomMenu({
   selectedMenu,
+  isPointsAvailable = true,
   menuHeight,
   bottomSafeInset,
   menuIconSize,
@@ -98,17 +100,19 @@ export function HomeBottomMenu({
     >
       <View style={styles.bottomMenuInner}>
         {items.map((item) => {
-          const isSelected = selectedMenu === item.key;
+          const isDisabled = item.key === 'POINTS' && !isPointsAvailable;
+          const isSelected = !isDisabled && selectedMenu === item.key;
           return (
             <Pressable
               key={item.key}
               accessibilityRole="button"
-              accessibilityState={{ selected: isSelected }}
+              accessibilityState={{ selected: isSelected, disabled: isDisabled }}
               accessibilityLabel={item.label}
               onPress={item.onPress}
               style={({ pressed }) => [
                 styles.bottomMenuItem,
-                pressed && styles.pressedMenuItem,
+                isDisabled && styles.disabledMenuItem,
+                pressed && !isDisabled && styles.pressedMenuItem,
               ]}
             >
               <View
@@ -166,6 +170,7 @@ function createStyles(theme: Theme) {
       minHeight: SPACING.touchTargetMin,
     },
     pressedMenuItem: { opacity: 0.72 },
+    disabledMenuItem: { opacity: 0.45 },
     bottomMenuIcon: { alignItems: 'center', justifyContent: 'center' },
     bottomMenuLabel: {
       fontSize: TYPOGRAPHY.caption.fontSize,
