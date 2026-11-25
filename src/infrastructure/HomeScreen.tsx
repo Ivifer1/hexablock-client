@@ -3,14 +3,12 @@ import {
   AccessibilityInfo,
   Animated,
   Platform,
-  SafeAreaView,
   StatusBar as RNStatusBar,
   StyleSheet,
   Text,
   View,
   useWindowDimensions,
 } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
 import type {
   IAssetResolver,
   IHomeController,
@@ -21,7 +19,6 @@ import type {
 import type { HomeModeDTO, HomeViewDTO } from '../application/value-objects';
 import { HexModeSelector, type ExtendedHomeModeDTO } from './HexModeSelector';
 import type { IHomePreview } from './home-previews';
-import { HomeAtmosphere } from './home/HomeAtmosphere';
 import { HomeBottomMenu, type HomeMenuItemKey } from './home/HomeBottomMenu';
 import { HomeHeader } from './home/HomeHeader';
 import { HomeModeCard } from './home/HomeModeCard';
@@ -35,7 +32,7 @@ import {
   useTheme,
   type Theme,
 } from './theme';
-import { AppButton } from './ui';
+import { AppButton, MenuScreenShell } from './ui';
 import { PlayGlyphIcon } from './ui-icons/MenuIcons';
 
 export type { ExtendedHomeModeDTO };
@@ -157,36 +154,60 @@ export function HomeScreen({
     : playNowText;
 
   return (
-    <SafeAreaView style={styles.page}>
-      <StatusBar style={isDark ? 'light' : 'dark'} />
-      <HomeAtmosphere theme={theme} isDark={isDark} />
-
-      <View style={styles.content}>
-        <View
-          style={[
-            styles.bodyArea,
-            {
-              paddingHorizontal: layout.horizontalPadding,
-              paddingTop: layout.topSafeInset,
-              paddingBottom: layout.bodyPaddingBottom,
-            },
-          ]}
-        >
-          <HomeHeader
-            sessionLabel={textCatalog.resolve(view.sessionLabel, locale)}
-            hasSession={view.hasSession}
-            fontScale={layout.fontScale}
-            theme={theme}
-            isDark={isDark}
-            onPressSession={() => controller.openSession(view.hasSession)}
-          />
-
-          <View
-            style={[
-              styles.mainBody,
-              { paddingVertical: layout.mainBodyPaddingVertical },
-            ]}
-          >
+    <MenuScreenShell
+      theme={theme}
+      isDark={isDark}
+      horizontalPadding={layout.horizontalPadding}
+      topSafeInset={layout.topSafeInset}
+      bodyPaddingBottom={layout.bodyPaddingBottom}
+      header={
+        <HomeHeader
+          sessionLabel={textCatalog.resolve(view.sessionLabel, locale)}
+          hasSession={view.hasSession}
+          fontScale={layout.fontScale}
+          theme={theme}
+          isDark={isDark}
+          onPressSession={() => controller.openSession(view.hasSession)}
+        />
+      }
+      bottomMenu={
+        <HomeBottomMenu
+          selectedMenu={selectedMenu}
+          isPointsAvailable={view.isPointsAvailable}
+          menuHeight={layout.menuHeight}
+          bottomSafeInset={layout.bottomSafeInset}
+          menuIconSize={layout.menuIconSize}
+          theme={theme}
+          textCatalog={textCatalog}
+          locale={locale}
+          onPressPoints={() => {
+            const navigated = controller.openPoints(
+              view.hasSession,
+              view.isPointsAvailable,
+            );
+            if (navigated) {
+              setSelectedMenu('POINTS');
+            }
+          }}
+          onPressPlay={() => {
+            setSelectedMenu('PLAY');
+            if (selected) {
+              controller.play(selected.id);
+            }
+          }}
+          onPressSettings={() => {
+            setSelectedMenu('SETTINGS');
+            controller.openSettings();
+          }}
+        />
+      }
+    >
+      <View
+        style={[
+          styles.mainBody,
+          { paddingVertical: layout.mainBodyPaddingVertical },
+        ]}
+      >
             <Text
               accessibilityRole="header"
               style={[
@@ -288,56 +309,13 @@ export function HomeScreen({
                 ) : null}
               </>
             )}
-          </View>
-        </View>
-
-        <HomeBottomMenu
-          selectedMenu={selectedMenu}
-          isPointsAvailable={view.isPointsAvailable}
-          menuHeight={layout.menuHeight}
-          bottomSafeInset={layout.bottomSafeInset}
-          menuIconSize={layout.menuIconSize}
-          theme={theme}
-          textCatalog={textCatalog}
-          locale={locale}
-          onPressPoints={() => {
-            const navigated = controller.openPoints(
-              view.hasSession,
-              view.isPointsAvailable,
-            );
-            if (navigated) {
-              setSelectedMenu('POINTS');
-            }
-          }}
-          onPressPlay={() => {
-            setSelectedMenu('PLAY');
-            if (selected) {
-              controller.play(selected.id);
-            }
-          }}
-          onPressSettings={() => {
-            setSelectedMenu('SETTINGS');
-            controller.openSettings();
-          }}
-        />
       </View>
-    </SafeAreaView>
+    </MenuScreenShell>
   );
 }
 
 function createStyles(theme: Theme) {
   return StyleSheet.create({
-    page: { flex: 1, backgroundColor: theme.bg },
-    content: {
-      flex: 1,
-      width: '100%',
-      alignSelf: 'center',
-    },
-    bodyArea: {
-      flex: 1,
-      width: '100%',
-      overflow: 'hidden',
-    },
     mainBody: {
       flex: 1,
       width: '100%',
