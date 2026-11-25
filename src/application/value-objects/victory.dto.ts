@@ -1,28 +1,38 @@
 import type { GameId } from './game-hud.dto';
 import type { I18nKeyDTO } from './i18n-key.dto';
 
-export type VictoryResultVariant =
+export type VictoryResultSummary =
   | {
-      readonly kind: 'FIT';
+      readonly kind: 'LEVEL_STARS';
       readonly stars: number;
       readonly moves: number;
       readonly elapsedSeconds: number;
     }
   | {
-      readonly kind: 'SORT';
+      readonly kind: 'OBJECTIVES';
       readonly goalsCompleted: number;
       readonly goalsTotal: number;
       readonly score: number;
     }
   | {
-      readonly kind: 'MERGE';
+      readonly kind: 'TARGET_VALUE';
       readonly targetTileValue: number;
       readonly score: number;
     }
   | {
-      readonly kind: 'OTHER';
+      readonly kind: 'SCORE_ONLY';
       readonly score: number;
+    }
+  | {
+      readonly kind: 'CUSTOM';
+      readonly metrics: readonly VictoryMetricDTO[];
     };
+
+export interface VictoryMetricDTO {
+  readonly key: string;
+  readonly label: I18nKeyDTO;
+  readonly value: number;
+}
 
 export type VictoryAction =
   | 'NEXT_LEVEL'
@@ -36,7 +46,7 @@ export interface VictoryViewDTO {
   readonly gameId: GameId;
   readonly title: I18nKeyDTO;
   readonly score: number;
-  readonly result: VictoryResultVariant;
+  readonly result: VictoryResultSummary;
   readonly isNewBest: boolean;
   readonly hasNextLevel: boolean;
   readonly canKeepPlaying: boolean;

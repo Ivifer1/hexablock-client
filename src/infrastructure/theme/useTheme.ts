@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { useColorScheme } from 'react-native';
-import { LIGHT_THEME, DARK_THEME, type Theme } from '../theme/tokens';
+import { LIGHT_THEME, DARK_THEME, type Theme } from './tokens';
 
 export function useTheme(): {
   readonly theme: Theme;

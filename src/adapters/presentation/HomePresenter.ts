@@ -1,5 +1,5 @@
 import type { IHomeOutputPort } from '../../application/ports/output';
-import type { IGameModeRegistry } from '../../application/ports';
+import type { IGameModeCatalog } from '../../application/ports';
 import type { HomeModeDTO, HomeViewDTO, HomeProgressDTO } from '../../application/value-objects';
 
 export interface HomePresentationInput {
@@ -7,21 +7,40 @@ export interface HomePresentationInput {
   readonly state: 'LOADING' | 'NORMAL' | 'EMPTY' | 'ERROR';
 }
 
-export class HomePresenter {
+export interface IHomePresenter {
+  present(input: HomePresentationInput): void;
+}
+
+export type HomeProgressMapper = () => HomeProgressDTO;
+
+const DEFAULT_PROGRESS_MAPPERS: Readonly<Record<string, HomeProgressMapper>> = {
+  best: () => ({ kind: 'NONE' }),
+  levels: () => ({ kind: 'LEVELS', completed: 0, total: 15 }),
+  none: () => ({ kind: 'NONE' }),
+};
+
+export class HomePresenter implements IHomePresenter {
+  private readonly progressMappers: Readonly<Record<string, HomeProgressMapper>>;
+
   public constructor(
     private readonly output: IHomeOutputPort,
-    private readonly registry: IGameModeRegistry,
-  ) {}
+    private readonly catalog: IGameModeCatalog,
+    customProgressMappers: Readonly<Record<string, HomeProgressMapper>> = {},
+  ) {
+    this.progressMappers = {
+      ...DEFAULT_PROGRESS_MAPPERS,
+      ...customProgressMappers,
+    };
+  }
 
   public present(input: HomePresentationInput): void {
-    const descriptors = this.registry.findAll();
+    const descriptors = this.catalog.findAll();
     if (descriptors.length === 0) {
       this.output.presentHome(this.emptyView());
       return;
     }
 
-    const defaultId = descriptors.find((descriptor) => descriptor.id === 'lines')?.id
-      ?? descriptors[0].id;
+    const defaultId = descriptors[0].id;
     const selectedModeId = input.selectedModeId
       && descriptors.some((descriptor) => descriptor.id === input.selectedModeId)
       ? input.selectedModeId
@@ -55,12 +74,14 @@ export class HomePresenter {
     });
   }
 
-  private progressFor(progressDescriptor: string, state: HomePresentationInput['state']): HomeProgressDTO {
+  private progressFor(
+    progressDescriptor: string,
+    state: HomePresentationInput['state'],
+  ): HomeProgressDTO {
     if (state === 'LOADING') return { kind: 'LOADING' };
     if (state === 'ERROR') return { kind: 'ERROR', message: { key: 'home.error_progress' } };
-    if (progressDescriptor === 'levels') return { kind: 'LEVELS', completed: 0, total: 15 };
-    if (progressDescriptor === 'none') return { kind: 'NONE' };
-    return { kind: 'LOADING' };
+    const mapper = this.progressMappers[progressDescriptor];
+    return mapper ? mapper() : { kind: 'NONE' };
   }
 
   private emptyView(): HomeViewDTO {

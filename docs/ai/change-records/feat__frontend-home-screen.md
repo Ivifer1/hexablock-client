@@ -98,13 +98,15 @@ seam that renders registered modes and routes by entry kind without variant bran
 - Replaced floating unbounded icon positions with a bounded rotating wheel container; Playwright verified 360×800 with no page overflow and tap selection for Hexa Merge.
 - Removed wheel/container rotation; mode icons and text now translate only between bounded ring positions.
 - Centered the main Inicio content within the viewport, verified at 360 px.
+- Extracted `HexModeSelector` and `wheelMath` (`src/infrastructure/HexModeSelector.tsx`, `src/infrastructure/wheelMath.ts`) to animate continuous shortest-arc wheel rotation on tap and interactive pointer/touch drag, keeping mode icons and labels upright via counter-rotation while scaling the active slot and subtly transitioning the detail card (respecting `reduceMotion`).
+- Extracted `homeLayout` (`src/infrastructure/homeLayout.ts`) with responsive wheel/card metrics across narrow/compact/wide viewports, fixed two-line description and header heights to eliminate mode-switch layout shift, and balanced game descriptions synchronized with `docs/specs/screens/10-textos.md`.
+- Replaced Home bottom-navigation and UI icons with a cohesive HexaBlock geometric outline/filled SVG icon set (`src/infrastructure/ui-icons/MenuIcons.tsx`) matching UC-006 (BR-006-2..4).
 - P-18 session/ranking intents are represented in the view model; concrete login/ranking destinations remain outside this handoff.
+- Refactored layers and SOLID compliance: moved React Native theme to `src/infrastructure/theme/`, tightened ESLint (`src/adapters/**`, inner-layer purity, `no-console`, `instanceof`, SRP complexity/params/depth thresholds and `max-lines` warning), segregated `IGameModeCatalog` / `IGameModeRegistry` and output stores under `src/adapters/state/`, removed concrete variant unions/branches from DTOs/presenters/UI, isolated adapter wiring exclusively in `CompositionRoot.ts`, and added `test/architecture/solid-architecture.test.ts`, `test/architecture/lsp-contracts.test.ts`, `npm run check:solid`, and a single-job `concurrency`-enabled `.github/workflows/ci.yml` gate.
 
 ## Verification
-- `npm run typecheck`: passed.
-- `npm run lint -- --quiet`: passed.
-- Focused Jest set: 32 tests passed.
-- `npm test -- --runInBand`: 32 tests passed.
+- `npm run check:solid` (`npm run lint && npm run typecheck && npm run test:arch`): passed with 0 ESLint errors/warnings and all architecture/LSP/OCP gates green.
+- `npm test`: all Jest suites passed.
 - Initial fail check: the home presentation test suite failed before `HomePresenter` and `HomeController` existed.
 
 ## AI usage

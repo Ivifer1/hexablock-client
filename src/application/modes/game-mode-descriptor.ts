@@ -1,4 +1,4 @@
-import type { GameId } from '../value-objects';
+import type { GameId } from '../value-objects/game-hud.dto';
 
 export type GameEntryKind = 'DIRECT' | 'LEVELS';
 

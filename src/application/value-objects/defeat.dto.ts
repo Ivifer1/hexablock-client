@@ -1,10 +1,7 @@
 import type { GameId } from './game-hud.dto';
 import type { I18nKeyDTO } from './i18n-key.dto';
 
-export type DefeatReason =
-  | 'LINES_NO_PIECE_FITS'
-  | 'SORT_BOARD_FULL'
-  | 'MERGE_NO_MOVE_CHANGES_BOARD';
+export type DefeatReason = string;
 
 export type DefeatAction = 'RETRY' | 'GO_TO_LEVELS' | 'GO_HOME';
 
