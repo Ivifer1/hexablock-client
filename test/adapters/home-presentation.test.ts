@@ -7,10 +7,12 @@ import {
   HomePresenter,
   HomeSelectionPreference,
   InMemoryHomeSessionReader,
+  InMemoryThemePreference,
+  ThemeController,
 } from '../../src/adapters/presentation';
 import { HomeOutputStore } from '../../src/adapters/state';
 import type { GameModeDescriptor } from '../../src/application/modes';
-import type { HomeDestination } from '../../src/application/ports';
+import type { HomeDestination, IThemeController, ThemeMode } from '../../src/application/ports';
 
 const modes: readonly GameModeDescriptor[] = [
   {
@@ -573,5 +575,79 @@ describe('UC-005 & UC-006 Home presentation and navigation', () => {
     expect(resolver.resolve('lines')).toBe('preview-lines');
     expect(resolver.resolve('unknown')).toBeNull();
     expect(resolver.resolve('toString')).toBeNull();
+  });
+
+  it('should_share_theme_changes_across_multiple_controllers_when_using_same_theme_controller', () => {
+    // Arrange
+    const themePreference = new InMemoryThemePreference();
+    const sharedTheme = new ThemeController(themePreference, 'light');
+    const observed: ThemeMode[] = [];
+    sharedTheme.subscribe((mode) => observed.push(mode));
+
+    const settingsLikeController = {
+      changeTheme(theme: IThemeController, mode: ThemeMode) {
+        theme.setMode(mode);
+      },
+    };
+
+    const pauseLikeController = {
+      toggle(theme: IThemeController) {
+        return theme.toggleTheme();
+      },
+    };
+
+    // Act
+    pauseLikeController.toggle(sharedTheme);
+    settingsLikeController.changeTheme(sharedTheme, 'light');
+
+    // Assert
+    expect(sharedTheme.getMode()).toBe('light');
+    expect(themePreference.load()).toBe('light');
+    expect(observed).toEqual(['dark', 'light']);
+  });
+
+  it('should_present_short_name_key_when_descriptor_defines_short_name_key', () => {
+    // Arrange
+    const output = new HomeOutputStore();
+    const registry = new GameModeRegistry([
+      { ...modes[0], shortNameKey: 'game.lines.short_name' },
+      modes[1],
+    ]);
+    const presenter = new HomePresenter(output, registry);
+
+    // Act
+    presenter.present({ selectedModeId: 'lines', state: 'NORMAL' });
+
+    // Assert
+    expect(output.current?.modes[0]?.shortName).toEqual({ key: 'game.lines.short_name' });
+    expect(output.current?.modes[1]?.shortName).toBeUndefined();
+  });
+
+  it('should_support_custom_i18n_progress_dto_when_custom_progress_mapper_returns_custom_kind', () => {
+    // Arrange
+    const output = new HomeOutputStore();
+    const registry = new GameModeRegistry([
+      {
+        ...modes[0],
+        id: 'goals',
+        progressDescriptor: 'goals-summary',
+      },
+    ]);
+    const progressProvider = new DefaultHomeProgressProvider({
+      'goals-summary': () => ({
+        kind: 'CUSTOM',
+        label: { key: 'common.goals_progress', parameters: { done: 2, total: 5 } },
+      }),
+    });
+    const presenter = new HomePresenter(output, registry, progressProvider);
+
+    // Act
+    presenter.present({ selectedModeId: 'goals', state: 'NORMAL' });
+
+    // Assert
+    expect(output.current?.modes[0]?.progress).toEqual({
+      kind: 'CUSTOM',
+      label: { key: 'common.goals_progress', parameters: { done: 2, total: 5 } },
+    });
   });
 });

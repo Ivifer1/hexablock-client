@@ -1,5 +1,11 @@
-import type { ImageSourcePropType } from 'react-native';
+import type { ReactNode } from 'react';
 
-export type HomePreviewAsset =
-  | { readonly kind: 'svg'; readonly xml: string }
-  | { readonly kind: 'image'; readonly source: ImageSourcePropType };
+export interface HomePreviewRenderProps {
+  readonly size: number;
+  readonly testID?: string;
+  readonly reduceMotion?: boolean;
+}
+
+export interface IHomePreview {
+  render(props: HomePreviewRenderProps): ReactNode;
+}

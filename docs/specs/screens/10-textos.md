@@ -43,12 +43,16 @@ Versión 0.1 · 2026-11-01 · Fuente única de textos para las pantallas 01 a 09
 | Clave | Español | English |
 | --- | --- | --- |
 | `game.lines.name` | Hexa Lines | Hexa Lines |
+| `game.lines.short_name` | Lines | Lines |
 | `game.lines.desc` | Conecta líneas completas y despeja el tablero. | Complete full hex lines to clear the board. |
 | `game.fit.name` | Hexa Fit | Hexa Fit |
+| `game.fit.short_name` | Fit | Fit |
 | `game.fit.desc` | Encaja todas las piezas hasta llenar la figura. | Fit every piece cleanly into the hex shape. |
 | `game.sort.name` | Hexa Sort | Hexa Sort |
+| `game.sort.short_name` | Sort | Sort |
 | `game.sort.desc` | Apila y ordena las fichas de un mismo color. | Stack and group matching tiles by color. |
 | `game.merge.name` | Hexa Merge | Hexa Merge |
+| `game.merge.short_name` | Merge | Merge |
 | `game.merge.desc` | Desliza y fusiona fichas hasta llegar a la meta. | Slide and merge tiles to reach the target. |
 
 ## Inicio
@@ -61,10 +65,13 @@ Versión 0.1 · 2026-11-01 · Fuente única de textos para las pantallas 01 a 09
 | `home.points` | Puntos | Points |
 | `home.session_user` | Hola, {name} | Hi, {name} |
 | `home.hero_title` | ¿A qué jugamos hoy? | What shall we play today? |
-| `home.hero_subtitle` | Cuatro formas de encontrar tu equilibrio. | Four ways to find your balance. |
+| `home.hero_subtitle` | Cuatro juegos. Una aventura mental. | Four games. One mental adventure. |
 | `home.entry_direct` | Partida directa | Direct play |
 | `home.entry_levels` | Por niveles | Level mode |
 | `home.play_mode` | Jugar {name} | Play {name} |
+| `home.play_now` | Jugar ahora | Play now |
+| `home.prev_mode` | Juego anterior | Previous game |
+| `home.next_mode` | Siguiente juego | Next game |
 | `home.theme_toggle_light` | Cambiar a modo claro | Switch to light mode |
 | `home.theme_toggle_dark` | Cambiar a modo oscuro | Switch to dark mode |
 | `home.error_progress` | No se pudo cargar tu progreso | We couldn't load your progress |

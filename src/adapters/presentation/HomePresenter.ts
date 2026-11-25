@@ -85,6 +85,7 @@ export class HomePresenter implements IHomePresenter {
     return {
       id: descriptor.id,
       name: { key: descriptor.nameKey },
+      ...(descriptor.shortNameKey ? { shortName: { key: descriptor.shortNameKey } } : {}),
       description: { key: descriptor.descriptionKey },
       entryKind: descriptor.entryKind,
       entryKindLabel: { key: ENTRY_KIND_LABEL_KEYS[descriptor.entryKind] ?? 'home.entry_direct' },

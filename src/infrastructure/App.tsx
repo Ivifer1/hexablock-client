@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import type { IHomeNavigationPort } from '../application/ports';
+import { Appearance } from 'react-native';
+import type { IHomeNavigationPort, ThemeMode } from '../application/ports';
 import type { HomeViewDTO } from '../application/value-objects';
 import { CompositionRoot } from './CompositionRoot';
 import { DEFAULT_HOME_MODE_REGISTRATIONS } from './homeModeRegistrations';
@@ -11,7 +12,15 @@ const homeNavigator: IHomeNavigationPort = {
   },
 };
 
-const compositionRoot = new CompositionRoot(DEFAULT_HOME_MODE_REGISTRATIONS, homeNavigator);
+const initialThemeMode: ThemeMode =
+  Appearance.getColorScheme() === 'dark' ? 'dark' : 'light';
+
+const compositionRoot = new CompositionRoot(
+  DEFAULT_HOME_MODE_REGISTRATIONS,
+  homeNavigator,
+  undefined,
+  { initialThemeMode },
+);
 compositionRoot.initializeHome();
 
 export default function App() {
@@ -28,6 +37,7 @@ export default function App() {
       view={view}
       controller={compositionRoot.homeController}
       textCatalog={compositionRoot.textCatalog}
+      themeController={compositionRoot.themeController}
       modeIconResolver={compositionRoot.modeIconResolver}
       previewResolver={compositionRoot.previewAssetResolver}
     />

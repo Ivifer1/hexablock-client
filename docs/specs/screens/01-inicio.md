@@ -99,3 +99,4 @@ Para probar la extensibilidad, la pantalla debe mostrar una quinta tarjeta si se
 
 - P-18 resuelto: se muestra el indicador de sesión y el acceso a ranking.
 - P-17 pendiente: ajustar el diseño final de Ajustes no cambia el comportamiento obligatorio de Inicio.
+- Pendiente para fase final (todos los modos): los SVG actuales de vista previa (en particular Hexa Merge y Hexa Sort, cuyas piezas se salen de las celdas) son provisionales; cuando el juego esté listo, tomar capturas reales in-game de todos los modos y configurarlas como previews estáticos en `assets/ui/home-previews/`.

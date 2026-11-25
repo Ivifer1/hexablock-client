@@ -1,24 +1,17 @@
-import { Image } from 'react-native';
-import { SvgXml } from 'react-native-svg';
-import type { HomePreviewAsset } from './types';
+import type { IHomePreview } from './types';
 
 export interface HomePreviewVisualProps {
-  readonly asset: HomePreviewAsset;
+  readonly preview: IHomePreview;
   readonly size: number;
   readonly testID?: string;
+  readonly reduceMotion?: boolean;
 }
 
-export function HomePreviewVisual({ asset, size, testID }: HomePreviewVisualProps) {
-  if (asset.kind === 'svg') {
-    return <SvgXml xml={asset.xml} width={size} height={size} testID={testID} />;
-  }
-
-  return (
-    <Image
-      source={asset.source}
-      style={{ width: size, height: size }}
-      resizeMode="contain"
-      testID={testID}
-    />
-  );
+export function HomePreviewVisual({
+  preview,
+  size,
+  testID,
+  reduceMotion,
+}: HomePreviewVisualProps) {
+  return <>{preview.render({ size, testID, reduceMotion })}</>;
 }

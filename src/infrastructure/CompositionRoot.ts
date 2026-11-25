@@ -15,6 +15,8 @@ import {
   HomePresenter,
   HomeSelectionPreference,
   InMemoryHomeSessionReader,
+  InMemoryThemePreference,
+  ThemeController,
   type IHomePresenter,
 } from '../adapters/presentation';
 import type { GameModeDescriptor } from '../application/modes';
@@ -27,9 +29,12 @@ import type {
   IHomeSelectionPreference,
   IHomeSessionReader,
   ITextCatalog,
+  IThemeController,
+  IThemePreference,
+  ThemeMode,
 } from '../application/ports';
 import type { ScreenLoadState } from '../application/value-objects';
-import type { HomePreviewAsset } from './home-previews';
+import type { IHomePreview } from './home-previews';
 import type { GameModeRegistration } from './homeModeRegistrations';
 import { HOME_TEXT_CATALOG } from './i18n/homeTranslations';
 import type { ModeIconComponent } from './mode-icons';
@@ -41,6 +46,9 @@ const NOOP_NAVIGATOR: IHomeNavigationPort = {
 export interface CompositionRootOptions {
   readonly progressProvider?: IHomeProgressProvider;
   readonly sessionReader?: IHomeSessionReader;
+  readonly themePreference?: IThemePreference;
+  readonly initialThemeMode?: ThemeMode;
+  readonly themeController?: IThemeController;
 }
 
 function isModeRegistration(
@@ -52,7 +60,7 @@ function isModeRegistration(
 export class CompositionRoot {
   public readonly modeRegistry: IGameModeRegistry;
   public readonly modeIconResolver: IAssetResolver<ModeIconComponent>;
-  public readonly previewAssetResolver: IAssetResolver<HomePreviewAsset>;
+  public readonly previewAssetResolver: IAssetResolver<IHomePreview>;
   public readonly homeOutput: HomeOutputStore;
   public readonly hudOutput: GameHudOutputStore;
   public readonly controlsOutput: GameControlsOutputStore;
@@ -62,6 +70,8 @@ export class CompositionRoot {
   public readonly homeSelectionPreference: IHomeSelectionPreference;
   public readonly progressProvider: IHomeProgressProvider;
   public readonly sessionReader: IHomeSessionReader;
+  public readonly themePreference: IThemePreference;
+  public readonly themeController: IThemeController;
   public readonly homePresenter: IHomePresenter;
   public readonly homeController: IHomeController;
   public readonly textCatalog: ITextCatalog;
@@ -74,7 +84,7 @@ export class CompositionRoot {
   ) {
     const descriptors: GameModeDescriptor[] = [];
     const iconEntries: Record<string, ModeIconComponent> = {};
-    const previewEntries: Record<string, HomePreviewAsset> = {};
+    const previewEntries: Record<string, IHomePreview> = {};
 
     for (const entry of modes) {
       if (isModeRegistration(entry)) {
@@ -98,6 +108,10 @@ export class CompositionRoot {
     this.homeSelectionPreference = new HomeSelectionPreference();
     this.progressProvider = options.progressProvider ?? new DefaultHomeProgressProvider();
     this.sessionReader = options.sessionReader ?? new InMemoryHomeSessionReader();
+    this.themePreference = options.themePreference ?? new InMemoryThemePreference();
+    this.themeController =
+      options.themeController ??
+      new ThemeController(this.themePreference, options.initialThemeMode ?? 'light');
     this.homePresenter = new HomePresenter(
       this.homeOutput,
       this.modeRegistry,

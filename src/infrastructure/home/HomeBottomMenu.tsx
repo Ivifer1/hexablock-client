@@ -1,7 +1,6 @@
-import { useMemo } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { ITextCatalog, SupportedLocale } from '../../application/ports';
-import { BORDER_WIDTH, RADIUS, SPACING, TYPOGRAPHY, type Theme } from '../theme';
+import type { Theme } from '../theme';
+import { BottomNavBar, type BottomNavItem } from '../ui';
 import {
   PlayMenuIcon,
   PointsMenuIcon,
@@ -19,6 +18,7 @@ export interface HomeBottomMenuProps {
   readonly theme: Theme;
   readonly textCatalog: ITextCatalog;
   readonly locale: SupportedLocale;
+  readonly items?: readonly BottomNavItem<HomeMenuItemKey>[];
   readonly onPressPoints: () => void;
   readonly onPressPlay: () => void;
   readonly onPressSettings: () => void;
@@ -33,28 +33,22 @@ export function HomeBottomMenu({
   theme,
   textCatalog,
   locale,
+  items,
   onPressPoints,
   onPressPlay,
   onPressSettings,
 }: HomeBottomMenuProps) {
-  const styles = useMemo(() => createStyles(theme), [theme]);
-  const menuIconSlotHeight = Math.round(menuIconSize * 1.35);
-
-  const items: readonly {
-    readonly key: HomeMenuItemKey;
-    readonly label: string;
-    readonly onPress: () => void;
-    readonly renderIcon: (selected: boolean) => React.ReactNode;
-  }[] = [
+  const defaultItems: readonly BottomNavItem<HomeMenuItemKey>[] = [
     {
       key: 'POINTS',
       label: textCatalog.resolve('home.points', locale),
+      disabled: !isPointsAvailable,
       onPress: onPressPoints,
-      renderIcon: (selected) => (
+      renderIcon: ({ color, cutoutColor, iconSize, selected }) => (
         <PointsMenuIcon
-          color={selected ? theme.primary : theme.textSecondary}
-          cutoutColor={theme.surface}
-          size={menuIconSize}
+          color={color}
+          cutoutColor={cutoutColor}
+          size={iconSize}
           filled={selected}
         />
       ),
@@ -63,11 +57,11 @@ export function HomeBottomMenu({
       key: 'PLAY',
       label: textCatalog.resolve('home.play', locale),
       onPress: onPressPlay,
-      renderIcon: (selected) => (
+      renderIcon: ({ color, activeSlotSize, selected }) => (
         <PlayMenuIcon
-          color={selected ? theme.primary : theme.textSecondary}
+          color={color}
           cutoutColor={theme.primaryFg}
-          size={menuIconSlotHeight}
+          size={activeSlotSize}
           filled={selected}
         />
       ),
@@ -76,11 +70,11 @@ export function HomeBottomMenu({
       key: 'SETTINGS',
       label: textCatalog.resolve('home.settings', locale),
       onPress: onPressSettings,
-      renderIcon: (selected) => (
+      renderIcon: ({ color, cutoutColor, iconSize, selected }) => (
         <SettingsMenuIcon
-          color={selected ? theme.primary : theme.textSecondary}
-          cutoutColor={theme.surface}
-          size={menuIconSize}
+          color={color}
+          cutoutColor={cutoutColor}
+          size={iconSize}
           filled={selected}
         />
       ),
@@ -88,110 +82,13 @@ export function HomeBottomMenu({
   ];
 
   return (
-    <View
-      style={[
-        styles.bottomMenu,
-        {
-          height: menuHeight + bottomSafeInset,
-          paddingTop: SPACING.s2,
-          paddingBottom: bottomSafeInset,
-        },
-      ]}
-    >
-      <View style={styles.bottomMenuInner}>
-        {items.map((item) => {
-          const isDisabled = item.key === 'POINTS' && !isPointsAvailable;
-          const isSelected = !isDisabled && selectedMenu === item.key;
-          return (
-            <Pressable
-              key={item.key}
-              accessibilityRole="button"
-              accessibilityState={{ selected: isSelected, disabled: isDisabled }}
-              accessibilityLabel={item.label}
-              onPress={item.onPress}
-              style={({ pressed }) => [
-                styles.bottomMenuItem,
-                isDisabled && styles.disabledMenuItem,
-                pressed && !isDisabled && styles.pressedMenuItem,
-              ]}
-            >
-              <View
-                style={[
-                  styles.bottomMenuIcon,
-                  { width: menuIconSlotHeight, height: menuIconSlotHeight },
-                ]}
-              >
-                {item.renderIcon(isSelected)}
-              </View>
-              <Text
-                style={[
-                  styles.bottomMenuLabel,
-                  isSelected && styles.bottomMenuLabelSelected,
-                ]}
-              >
-                {item.label}
-              </Text>
-              <View style={styles.menuActiveDotSlot}>
-                {isSelected ? <View style={styles.menuActiveDot} /> : null}
-              </View>
-            </Pressable>
-          );
-        })}
-      </View>
-    </View>
+    <BottomNavBar
+      items={items ?? defaultItems}
+      selectedKey={selectedMenu}
+      height={menuHeight}
+      bottomSafeInset={bottomSafeInset}
+      iconSize={menuIconSize}
+      theme={theme}
+    />
   );
-}
-
-function createStyles(theme: Theme) {
-  return StyleSheet.create({
-    bottomMenu: {
-      width: '100%',
-      borderTopWidth: BORDER_WIDTH.thin,
-      borderTopColor: theme.borderDefault,
-      backgroundColor: theme.surface,
-      alignItems: 'center',
-      ...theme.shadowLow,
-    },
-    bottomMenuInner: {
-      width: '100%',
-      maxWidth: 480,
-      alignSelf: 'center',
-      height: '100%',
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-    },
-    bottomMenuItem: {
-      flex: 1,
-      height: '100%',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: 3,
-      minHeight: SPACING.touchTargetMin,
-    },
-    pressedMenuItem: { opacity: 0.72 },
-    disabledMenuItem: { opacity: 0.45 },
-    bottomMenuIcon: { alignItems: 'center', justifyContent: 'center' },
-    bottomMenuLabel: {
-      fontSize: TYPOGRAPHY.caption.fontSize,
-      lineHeight: TYPOGRAPHY.caption.lineHeight,
-      fontWeight: TYPOGRAPHY.caption.fontWeight,
-      color: theme.textSecondary,
-    },
-    bottomMenuLabelSelected: {
-      color: theme.primary,
-      fontWeight: '700',
-    },
-    menuActiveDotSlot: {
-      height: 6,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    menuActiveDot: {
-      width: 4,
-      height: 4,
-      borderRadius: RADIUS.full,
-      backgroundColor: theme.primary,
-    },
-  });
 }

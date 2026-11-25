@@ -5,6 +5,7 @@ export type GameEntryKind = 'DIRECT' | 'LEVELS';
 export interface GameModeDescriptor {
   readonly id: GameId;
   readonly nameKey: string;
+  readonly shortNameKey?: string;
   readonly descriptionKey: string;
   readonly entryKind: GameEntryKind;
   readonly progressDescriptor: string;

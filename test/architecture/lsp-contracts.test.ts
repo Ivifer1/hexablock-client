@@ -8,6 +8,8 @@ import {
   DefaultHomeProgressProvider,
   HomeSelectionPreference,
   InMemoryHomeSessionReader,
+  InMemoryThemePreference,
+  ThemeController,
 } from '../../src/adapters/presentation';
 import {
   DefeatOutputStore,
@@ -25,6 +27,9 @@ import type {
   IHomeSelectionPreference,
   IHomeSessionReader,
   ITextCatalog,
+  IThemeController,
+  IThemePreference,
+  ThemeMode,
 } from '../../src/application/ports';
 import type {
   DefeatViewDTO,
@@ -347,6 +352,52 @@ describe('LSP contract suites', () => {
       // Assert
       expect(typeof snapshot.isAuthenticated).toBe('boolean');
       expect(snapshot.displayName === null || typeof snapshot.displayName === 'string').toBe(true);
+    });
+  });
+
+  describe.each<{ name: string; create: () => IThemePreference }>([
+    {
+      name: 'InMemoryThemePreference',
+      create: () => new InMemoryThemePreference(),
+    },
+  ])('IThemePreference contract: $name', ({ create }) => {
+    it('should_persist_and_overwrite_theme_mode_when_saved', () => {
+      // Arrange
+      const preference = create();
+
+      // Act & Assert
+      expect(preference.load()).toBeNull();
+      preference.save('dark');
+      expect(preference.load()).toBe('dark');
+      preference.save('light');
+      expect(preference.load()).toBe('light');
+    });
+  });
+
+  describe.each<{ name: string; create: () => IThemeController }>([
+    {
+      name: 'ThemeController',
+      create: () => new ThemeController(new InMemoryThemePreference(), 'light'),
+    },
+  ])('IThemeController contract: $name', ({ create }) => {
+    it('should_toggle_set_and_notify_only_active_subscribers_when_mode_changes', () => {
+      // Arrange
+      const controller = create();
+      const observed: ThemeMode[] = [];
+      const unsubscribe = controller.subscribe((mode) => observed.push(mode));
+
+      // Act
+      expect(controller.getMode()).toBe('light');
+      const toggled = controller.toggleTheme();
+      controller.setMode('dark');
+      controller.setMode('light');
+      unsubscribe();
+      controller.toggleTheme();
+
+      // Assert
+      expect(toggled).toBe('dark');
+      expect(controller.getMode()).toBe('dark');
+      expect(observed).toEqual(['dark', 'light']);
     });
   });
 });

@@ -1,6 +1,6 @@
 import { createElement } from 'react';
 import { AccessibilityInfo, View as mockRNView } from 'react-native';
-import { fireEvent, render, waitFor } from '@testing-library/react-native';
+import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
 import { StaticTextCatalog } from '../../src/adapters/i18n';
 import { InMemoryHomeSessionReader } from '../../src/adapters/presentation';
 import type { HomeDestination, SupportedLocale } from '../../src/application/ports';
@@ -11,7 +11,9 @@ import {
   type GameModeRegistration,
 } from '../../src/infrastructure/homeModeRegistrations';
 import { HOME_TEXT_CATALOG } from '../../src/infrastructure/i18n/homeTranslations';
+import { SvgHomePreview } from '../../src/infrastructure/home-previews';
 import { BlockIcon } from '../../src/infrastructure/mode-icons';
+import { BUTTON_SIZES, DARK_THEME, LIGHT_THEME } from '../../src/infrastructure/theme';
 
 const mockCreateElement = createElement;
 
@@ -63,6 +65,7 @@ describe('HomeScreen UI (UC-005 & UC-006)', () => {
         view={view}
         controller={root.homeController}
         textCatalog={root.textCatalog}
+        themeController={root.themeController}
         locale={options.locale ?? 'es'}
         modeIconResolver={root.modeIconResolver}
         previewResolver={root.previewAssetResolver}
@@ -76,6 +79,7 @@ describe('HomeScreen UI (UC-005 & UC-006)', () => {
           view={latestView}
           controller={root.homeController}
           textCatalog={root.textCatalog}
+          themeController={root.themeController}
           locale={nextLocale ?? options.locale ?? 'es'}
           modeIconResolver={root.modeIconResolver}
           previewResolver={root.previewAssetResolver}
@@ -116,7 +120,7 @@ describe('HomeScreen UI (UC-005 & UC-006)', () => {
         controls: ['pause'],
       },
       icon: BlockIcon,
-      preview: { kind: 'svg', xml: '<svg data-preview="fill" />' },
+      preview: new SvgHomePreview('<svg data-preview="fill" />'),
     };
     const catalog = new StaticTextCatalog(
       {
@@ -176,12 +180,13 @@ describe('HomeScreen UI (UC-005 & UC-006)', () => {
 
   it('should_render_progress_placeholder_when_progress_is_loading', async () => {
     // Arrange & Act
-    const { getByText } = await renderHome({ state: 'LOADING' });
+    const { getByLabelText, getByText } = await renderHome({ state: 'LOADING' });
 
     // Assert
     await waitFor(() => {
       expect(getByText('…')).toBeTruthy();
-      expect(getByText('Jugar Hexa Lines')).toBeTruthy();
+      expect(getByText('Jugar ahora')).toBeTruthy();
+      expect(getByLabelText('Jugar Hexa Lines')).toBeTruthy();
     });
   });
 
@@ -208,9 +213,14 @@ describe('HomeScreen UI (UC-005 & UC-006)', () => {
 
   it('should_open_login_when_session_indicator_is_tapped_without_session', async () => {
     // Arrange
-    const { getByTestId, navigated } = await renderHome({ isAuthenticated: false });
+    const { getByLabelText, getByTestId, getByText, queryByTestId, navigated } = await renderHome({
+      isAuthenticated: false,
+    });
 
-    // Act
+    // Assert & Act
+    expect(getByText('Iniciar sesión')).toBeTruthy();
+    expect(getByLabelText('Iniciar sesión')).toBeTruthy();
+    expect(queryByTestId('home-session-active-dot')).toBeNull();
     await fireEvent.press(getByTestId('home-session-button'));
 
     // Assert
@@ -221,17 +231,88 @@ describe('HomeScreen UI (UC-005 & UC-006)', () => {
 
   it('should_open_ranking_when_session_indicator_is_tapped_with_session', async () => {
     // Arrange
-    const { getByText, getByTestId, navigated } = await renderHome({
+    const { getByLabelText, getByTestId, getByText, navigated } = await renderHome({
       isAuthenticated: true,
       displayName: 'Leonardo',
     });
 
     // Assert label & Act
     expect(getByText('Hola, Leonardo')).toBeTruthy();
+    expect(getByLabelText('Hola, Leonardo')).toBeTruthy();
+    expect(getByTestId('home-session-active-dot')).toBeTruthy();
     await fireEvent.press(getByTestId('home-session-button'));
 
     await waitFor(() => {
       expect(navigated).toEqual(['RANKING']);
+    });
+  });
+
+  it('should_render_home_without_scroll_view_when_home_loads', async () => {
+    // Arrange
+    const hasScrollViewNode = (node: unknown): boolean => {
+      if (!node || typeof node !== 'object') return false;
+      if (Array.isArray(node)) return node.some((child) => hasScrollViewNode(child));
+      const element = node as { readonly type?: unknown; readonly children?: unknown };
+      if (element.type === 'RCTScrollView' || element.type === 'ScrollView') return true;
+      return Array.isArray(element.children)
+        ? element.children.some((child) => hasScrollViewNode(child))
+        : false;
+    };
+
+    // Act
+    const { toJSON } = await renderHome();
+
+    // Assert
+    expect(hasScrollViewNode(toJSON())).toBe(false);
+  });
+
+  it('should_render_integrated_mode_labels_on_mode_tiles_when_home_loads', async () => {
+    // Arrange & Act
+    const { getByTestId } = await renderHome();
+    const extractText = (node: ReturnType<typeof getByTestId>): string => {
+      const children = node.props.children;
+      if (typeof children === 'string') return children;
+      if (Array.isArray(children)) {
+        return children.map((child) => (typeof child === 'string' ? child : extractText(child))).join('');
+      }
+      return children && typeof children === 'object' && 'props' in children
+        ? extractText(children as ReturnType<typeof getByTestId>)
+        : '';
+    };
+
+    // Assert
+    expect(extractText(getByTestId('mode-tile-label-lines'))).toBe('Lines');
+    expect(extractText(getByTestId('mode-tile-label-merge'))).toBe('Merge');
+    expect(extractText(getByTestId('mode-tile-label-sort'))).toBe('Sort');
+    expect(extractText(getByTestId('mode-tile-label-fit'))).toBe('Fit');
+  });
+
+  it('should_cycle_modes_when_previous_and_next_arrows_are_pressed', async () => {
+    // Arrange
+    const { getByTestId, getByLabelText, getByText, rerenderLatest } = await renderHome();
+    const initialPreview = getByTestId('home-center-preview').props.accessibilityLabel;
+    expect(getByText('Partida directa')).toBeTruthy();
+
+    // Act: advance to Merge
+    await fireEvent.press(getByTestId('home-next-mode-button'));
+    await rerenderLatest();
+
+    // Assert Merge selected
+    await waitFor(() => {
+      expect(getByLabelText('Jugar Hexa Merge')).toBeTruthy();
+      expect(getByTestId('home-center-preview').props.accessibilityLabel).not.toBe(initialPreview);
+    });
+
+    // Act: step back to Lines, then wrap to Fit
+    await fireEvent.press(getByTestId('home-prev-mode-button'));
+    await rerenderLatest();
+    await fireEvent.press(getByTestId('home-prev-mode-button'));
+    await rerenderLatest();
+
+    // Assert Fit selected with levels metadata
+    await waitFor(() => {
+      expect(getByLabelText('Jugar Hexa Fit')).toBeTruthy();
+      expect(getByText('Por niveles')).toBeTruthy();
     });
   });
 
@@ -256,20 +337,70 @@ describe('HomeScreen UI (UC-005 & UC-006)', () => {
 
   it('should_switch_all_visible_texts_when_locale_changes_between_spanish_and_english', async () => {
     // Arrange
-    const { getByText, rerenderLatest } = await renderHome({ locale: 'es' });
-    expect(getByText('¿A qué jugamos hoy?')).toBeTruthy();
+    const { getByLabelText, getByText, rerenderLatest } = await renderHome({ locale: 'es' });
+    expect(getByText('Cuatro juegos. Una aventura mental.')).toBeTruthy();
     expect(getByText('Partida directa')).toBeTruthy();
+    expect(getByText('Jugar ahora')).toBeTruthy();
 
     // Act
     await rerenderLatest('en');
 
     // Assert
     await waitFor(() => {
-      expect(getByText('What shall we play today?')).toBeTruthy();
+      expect(getByText('Four games. One mental adventure.')).toBeTruthy();
       expect(getByText('Direct play')).toBeTruthy();
-      expect(getByText('Play Hexa Lines')).toBeTruthy();
+      expect(getByText('Play now')).toBeTruthy();
+      expect(getByLabelText('Play Hexa Lines')).toBeTruthy();
+      expect(getByText('Sign in')).toBeTruthy();
       expect(getByText('Settings')).toBeTruthy();
       expect(getByText('Points')).toBeTruthy();
     });
+  });
+
+  it('should_not_render_theme_toggle_and_sync_external_theme_changes_when_home_is_rendered', async () => {
+    // Arrange
+    const { queryByLabelText, root, toJSON } = await renderHome({ locale: 'es' });
+    const rootBg = () =>
+      (toJSON() as { readonly props?: { readonly style?: { readonly backgroundColor?: string } } })
+        ?.props?.style?.backgroundColor;
+
+    expect(queryByLabelText('Cambiar a modo oscuro')).toBeNull();
+    expect(queryByLabelText('Cambiar a modo claro')).toBeNull();
+    expect(rootBg()).toBe(LIGHT_THEME.bg);
+
+    // Act: external controller (e.g. Settings) changes theme to dark
+    await act(async () => {
+      root.themeController.setMode('dark');
+    });
+
+    // Assert Home stays synchronized
+    await waitFor(() => {
+      expect(root.themeController.getMode()).toBe('dark');
+      expect(rootBg()).toBe(DARK_THEME.bg);
+    });
+  });
+
+  it('should_render_session_button_with_small_size_token_when_home_loads', async () => {
+    // Arrange & Act
+    const { getByTestId, getByText } = await renderHome({ isAuthenticated: false });
+    const sessionButton = getByTestId('home-session-button');
+    const sessionText = getByText('Iniciar sesión');
+    const flattenStyle = (style: unknown): Record<string, unknown> => {
+      if (!style) return {};
+      if (Array.isArray(style)) {
+        return style.reduce<Record<string, unknown>>(
+          (acc, entry) => ({ ...acc, ...flattenStyle(entry) }),
+          {},
+        );
+      }
+      return typeof style === 'object' ? (style as Record<string, unknown>) : {};
+    };
+
+    const buttonStyle = flattenStyle(sessionButton.props.style);
+    const labelStyle = flattenStyle(sessionText.props.style);
+
+    // Assert
+    expect(Number(buttonStyle.minHeight)).toBeLessThan(BUTTON_SIZES.m.minHeight);
+    expect(Number(labelStyle.fontSize)).toBeLessThan(BUTTON_SIZES.m.fontSize);
   });
 });

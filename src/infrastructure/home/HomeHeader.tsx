@@ -1,65 +1,64 @@
 import { useMemo } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { BlockIcon } from '../mode-icons';
-import { BORDER_WIDTH, RADIUS, SPACING, type Theme } from '../theme';
-import { ThemeToggleIcon } from '../ui-icons/MenuIcons';
+import { BORDER_WIDTH, RADIUS, SPACING, type ButtonSize, type Theme } from '../theme';
+import { AppButton } from '../ui';
+import { SessionActionIcon } from '../ui-icons/MenuIcons';
 
 export interface HomeHeaderProps {
-  readonly title: string;
-  readonly toggleLabel: string;
+  readonly sessionLabel: string;
+  readonly hasSession: boolean;
+  readonly sessionButtonSize?: ButtonSize;
   readonly fontScale: number;
   readonly theme: Theme;
   readonly isDark: boolean;
-  readonly onToggleTheme: () => void;
+  readonly onPressSession: () => void;
 }
 
 export function HomeHeader({
-  title,
-  toggleLabel,
+  sessionLabel,
+  hasSession,
+  sessionButtonSize = 's',
   fontScale,
   theme,
   isDark,
-  onToggleTheme,
+  onPressSession,
 }: HomeHeaderProps) {
   const styles = useMemo(() => createStyles(theme), [theme]);
-  const brandSize = 36 * fontScale;
+  const brandSize = Math.round(34 * fontScale);
 
   return (
     <View style={styles.header}>
-      <View style={styles.brand} accessibilityRole="header">
-        <View style={{ width: brandSize, height: brandSize, alignItems: 'center', justifyContent: 'center' }}>
-          <BlockIcon color="#13968A" size={brandSize} isSelected />
-        </View>
-        <Text
-          numberOfLines={1}
-          adjustsFontSizeToFit
-          style={[
-            styles.title,
-            {
-              fontSize: 22 * fontScale,
-              lineHeight: 30 * fontScale,
-            },
-          ]}
-        >
-          {title}
-        </Text>
-      </View>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={toggleLabel}
-        onPress={onToggleTheme}
-        hitSlop={8}
-        style={({ pressed }) => [
-          styles.themeToggle,
-          pressed && styles.pressedControl,
-        ]}
+      <View
+        style={{
+          width: brandSize,
+          height: brandSize,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
       >
-        <ThemeToggleIcon
-          isDark={isDark}
-          color={isDark ? theme.warning : theme.textSecondary}
-          size={20}
-        />
-      </Pressable>
+        <BlockIcon color="#13968A" size={brandSize} isSelected />
+      </View>
+
+      <AppButton
+        testID="home-session-button"
+        label={sessionLabel}
+        variant="outline"
+        size={sessionButtonSize}
+        fontScale={fontScale}
+        theme={theme}
+        isDark={isDark}
+        onPress={onPressSession}
+        style={styles.sessionButton}
+        leftIcon={({ color, size }) => (
+          <SessionActionIcon hasSession={hasSession} color={color} size={size} />
+        )}
+        badge={
+          hasSession ? (
+            <View testID="home-session-active-dot" style={styles.sessionActiveDot} />
+          ) : null
+        }
+      />
     </View>
   );
 }
@@ -74,25 +73,22 @@ function createStyles(theme: Theme) {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
+      gap: SPACING.s2,
     },
-    brand: { flexDirection: 'row', alignItems: 'center', gap: SPACING.s3, flexShrink: 1 },
-    title: {
-      fontWeight: '800',
-      color: theme.textPrimary,
-      letterSpacing: -0.3,
-      flexShrink: 1,
+    sessionButton: {
+      maxWidth: '58%',
+      flexShrink: 0,
     },
-    themeToggle: {
-      width: SPACING.touchTargetMin,
-      height: SPACING.touchTargetMin,
+    sessionActiveDot: {
+      position: 'absolute',
+      top: -2,
+      right: -2,
+      width: 11,
+      height: 11,
       borderRadius: RADIUS.full,
-      borderWidth: BORDER_WIDTH.thin,
-      borderColor: theme.borderDefault,
-      backgroundColor: theme.surface,
-      alignItems: 'center',
-      justifyContent: 'center',
-      ...theme.shadowLow,
+      borderWidth: BORDER_WIDTH.thick,
+      backgroundColor: theme.success,
+      borderColor: theme.bg,
     },
-    pressedControl: { opacity: 0.88 },
   });
 }
