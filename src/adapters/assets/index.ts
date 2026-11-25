@@ -1,0 +1,1 @@
+export { StaticAssetResolver } from './StaticAssetResolver';

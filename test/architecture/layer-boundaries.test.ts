@@ -37,6 +37,9 @@ describe('layer boundaries', () => {
     ['src/application/sample.ts', 'react-native'],
     ['src/application/sample.ts', 'expo'],
     ['src/adapters/sample.ts', '../infrastructure/screen'],
+    ['src/adapters/sample.ts', 'react'],
+    ['src/adapters/sample.ts', 'react-native'],
+    ['src/adapters/sample.ts', 'expo'],
   ])('should_report_error_when_%s_imports_%s', async (layerFile, importPath) => {
     // Arrange: the layer file and the forbidden import come from the table.
 

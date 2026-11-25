@@ -6,9 +6,13 @@
     "expo": "~58.0.22",
     "expo-status-bar": "~58.0.4",
     "react": "19.3.0",
-    "react-native": "0.88.1"
+    "react-dom": "19.3.0",
+    "react-native": "0.88.1",
+    "react-native-svg": "15.16.0",
+    "react-native-web": "^0.21.4"
   },
   "devDependencies": {
+    "@testing-library/react-native": "^14.1.0",
     "@types/jest": "30.0.0",
     "@types/react": "~19.3.0",
     "eslint": "^9.0.0",
@@ -25,6 +29,8 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "jest",
+    "test:arch": "jest test/architecture",
+    "check:solid": "npm run lint && npm run typecheck && npm run test:arch",
     "guard:edits": "node .agents/hooks/guard-edits.mjs",
     "lint:edit": "node .agents/hooks/lint-on-edit.mjs"
   },

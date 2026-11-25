@@ -8,16 +8,25 @@ Estos archivos describen qué debe tener cada pantalla que se puede adelantar an
 
 | # | Archivo | Pantalla | Estado | Requerimientos |
 | --- | --- | --- | --- | --- |
-| 01 | `01-inicio.md` | Inicio y selector de juego | Lista para diseñar | SUI-01, SUI-02, SUI-08, PRG-02 |
-| 02 | `02-ajustes.md` | Ajustes | Lista para diseñar (P-17) | SUI-03, SUI-04, SUI-05 |
-| 03 | `03-login.md` | Inicio de sesión | Condicionada a P-18 y P-20 | INT-01, INT-02, INT-07, BCK-02 |
-| 04 | `04-registro.md` | Registro | Condicionada a P-18 y P-20 | INT-01, BCK-01 |
-| 05 | `05-seleccion-niveles.md` | Selección de niveles (Fit y Sort) | Lista para diseñar (P-15) | PRG-03, FIT-10, SUI-02 |
-| 06 | `06-victoria.md` | Victoria | Lista para diseñar (P-05, P-10, P-12) | SUI-06, PRG-08 |
-| 07 | `07-derrota.md` | Derrota | Lista para diseñar | SUI-07 |
-| 08 | `08-pausa.md` | Pausa | Lista para diseñar (P-16) | SUI-09, SUI-10, SUI-08 |
-| 09 | `09-partida-marco.md` | Partida: solo marco y HUD, sin tablero | Solo mockup | TAB-03, TAB-10, TAB-11 |
-| 10 | `10-textos.md` | Textos en español e inglés | Lista | SUI-04 |
+| 01 | [`Inicio`](./01-inicio.md) | Inicio y selector de juego | Implementada (pendiente navegación/integración) | SUI-01, SUI-02, SUI-08, PRG-02 |
+| 02 | [`Ajustes`](./02-ajustes.md) | Ajustes | Lista para diseñar (P-17) | SUI-03, SUI-04, SUI-05 |
+| 03 | [`Login`](./03-login.md) | Inicio de sesión | Condicionada a P-18 y P-20 | INT-01, INT-02, INT-07, BCK-02 |
+| 04 | [`Registro`](./04-registro.md) | Registro | Condicionada a P-18 y P-20 | INT-01, BCK-01 |
+| 05 | [`Selección de niveles`](./05-seleccion-niveles.md) | Selección de niveles (Fit y Sort) | Lista para diseñar (P-15) | PRG-03, FIT-10, SUI-02 |
+| 06 | [`Victoria`](./06-victoria.md) | Victoria | Lista para diseñar (P-05, P-10, P-12) | SUI-06, PRG-08 |
+| 07 | [`Derrota`](./07-derrota.md) | Derrota | Lista para diseñar | SUI-07 |
+| 08 | [`Pausa`](./08-pausa.md) | Pausa | Lista para diseñar (P-16) | SUI-09, SUI-10, SUI-08 |
+| 09 | [`Partida`](./09-partida-marco.md) | Partida: solo marco y HUD, sin tablero | Solo mockup | TAB-03, TAB-10, TAB-11 |
+| 10 | [`Textos`](./10-textos.md) | Textos en español e inglés | Lista | SUI-04 |
+
+## Organización por pantalla
+
+Las especificaciones funcionales viven directamente en este directorio:
+`docs/specs/screens/<número>-<nombre>.md`.
+
+Los recursos visuales y propuestas de diseño viven en
+`docs/ui-context/screens/<número>-<nombre>/`. Para Inicio, el mockup y los
+documentos visuales están separados del contrato funcional.
 
 ## Mapa de navegación
 
@@ -69,7 +78,7 @@ El destino al elegir un juego depende del **tipo** del juego (partida directa o 
 1. **Pantalla sin lógica de negocio.** Solo muestra lo que recibe y avisa qué hizo el usuario. No contiene reglas de juego, no hace peticiones de red ni lee almacenamiento. Con datos de ejemplo debe poder verse y probarse sola.
 2. **Cada pantalla declara tres cosas:** los datos que recibe, los eventos que emite y sus estados. Así se puede conectar después sin rehacerla.
 3. **Listas dinámicas.** La lista de juegos y la de niveles se generan a partir de los datos. No se diseñan cuatro botones fijos ni 15 niveles fijos: el backend permite añadir niveles (5.2.4) y la extensibilidad exige poder añadir una quinta variante (3.1).
-4. **Textos.** Ningún texto va escrito dentro de la pantalla: todos salen de `10-textos.md` por su clave. Cambiar de idioma no reinicia la app (SUI-04).
+4. **Textos.** Ningún texto va escrito dentro de la pantalla: todos salen de [`10-textos.md`](./10-textos.md) por su clave. Cambiar de idioma no reinicia la app (SUI-04).
 5. **Estados mínimos.** Toda pantalla que carga datos define sus estados de cargando, vacío, error y normal.
 6. **Vía de regreso.** Desde cualquier pantalla hay un camino de vuelta al selector de juego (SUI-08).
 7. **No depender solo del color.** Los estados (bloqueado, completado, error) llevan también icono o texto.
@@ -104,7 +113,7 @@ El destino al elegir un juego depende del **tipo** del juego (partida directa o 
 
 ## Convenciones de estos archivos
 
-- Cada elemento tiene un ID por pantalla (`INI-01`, `AJU-02`…) y una columna **Texto** con la clave de `10-textos.md`.
+- Cada elemento tiene un ID por pantalla (`INI-01`, `AJU-02`…) y una columna **Texto** con la clave de [`10-textos.md`](./10-textos.md).
 - **Obligatorio** significa que viene del enunciado. **Opcional** o **Condicionado** significa que depende de una decisión pendiente.
 - **Recibe** son los datos que la pantalla necesita para dibujarse. **Emite** son los avisos que da cuando el usuario actúa.
 - Los valores entre llaves, como `{value}` o `{n}`, son marcadores que se rellenan al mostrar el texto.

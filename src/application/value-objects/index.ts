@@ -7,6 +7,11 @@ export type {
 export type { GameHudDTO, GameId, LevelNumber } from './game-hud.dto';
 export type { I18nKeyDTO } from './i18n-key.dto';
 export type {
+  HomeModeDTO,
+  HomeProgressDTO,
+  HomeViewDTO,
+} from './home.dto';
+export type {
   LevelSelectionItemDTO,
   LevelSelectionAction,
   LevelSelectionViewDTO,
@@ -15,6 +20,7 @@ export type {
 export type { ScreenLoadState } from './screen-load-state';
 export type {
   VictoryAction,
-  VictoryResultVariant,
+  VictoryMetricDTO,
+  VictoryResultSummary,
   VictoryViewDTO,
 } from './victory.dto';
