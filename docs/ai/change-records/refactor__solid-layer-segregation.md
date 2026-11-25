@@ -1,6 +1,6 @@
 # Change record: refactor/solid-layer-segregation
 
-Status: PROPOSED
+Status: APPROVED
 <!-- Only a human changes this line to "Status: APPROVED" (hooks block the agent from doing it). -->
 Author(s): Leonardo Ibarra with Antigravity (Gemini 4 Neon)
 Date: 2026-11-24
