@@ -1,9 +1,14 @@
 /**
  * @jest-environment node
  */
+import { StaticAssetResolver } from '../../src/adapters/assets';
 import { GameModeRegistry } from '../../src/adapters/GameModeRegistry';
 import { StaticTextCatalog } from '../../src/adapters/i18n';
-import { HomeSelectionPreference } from '../../src/adapters/presentation/HomeSelectionPreference';
+import {
+  DefaultHomeProgressProvider,
+  HomeSelectionPreference,
+  InMemoryHomeSessionReader,
+} from '../../src/adapters/presentation';
 import {
   DefeatOutputStore,
   GameControlsOutputStore,
@@ -14,8 +19,11 @@ import {
 } from '../../src/adapters/state';
 import type { GameModeDescriptor } from '../../src/application/modes';
 import type {
+  IAssetResolver,
   IGameModeRegistry,
+  IHomeProgressProvider,
   IHomeSelectionPreference,
+  IHomeSessionReader,
   ITextCatalog,
 } from '../../src/application/ports';
 import type {
@@ -140,6 +148,7 @@ describe('LSP contract suites', () => {
         errorMessage: null,
         sessionLabel: { key: 'common.sign_in' },
         hasSession: false,
+        isPointsAvailable: true,
       } satisfies HomeViewDTO,
     },
     {
@@ -273,6 +282,71 @@ describe('LSP contract suites', () => {
       // Assert
       expect(store.current).toBe(sampleView);
       expect(received).toEqual([sampleView]);
+    });
+  });
+
+  describe.each<{ name: string; create: () => IAssetResolver<string> }>([
+    {
+      name: 'StaticAssetResolver',
+      create: () => new StaticAssetResolver({ 'mode-a': 'asset-a' }),
+    },
+  ])('IAssetResolver contract: $name', ({ create }) => {
+    it('should_resolve_known_key_and_return_null_for_missing_or_prototype_keys', () => {
+      // Arrange
+      const resolver = create();
+
+      // Act & Assert
+      expect(resolver.resolve('mode-a')).toBe('asset-a');
+      expect(resolver.resolve('missing')).toBeNull();
+      expect(resolver.resolve('constructor')).toBeNull();
+    });
+  });
+
+  describe.each<{ name: string; create: () => IHomeProgressProvider }>([
+    {
+      name: 'DefaultHomeProgressProvider',
+      create: () => new DefaultHomeProgressProvider(),
+    },
+  ])('IHomeProgressProvider contract: $name', ({ create }) => {
+    it('should_return_valid_progress_dto_for_known_and_unknown_descriptors', () => {
+      // Arrange
+      const provider = create();
+
+      // Act
+      const best = provider.getProgress(sampleDescriptor);
+      const levels = provider.getProgress({
+        ...sampleDescriptor,
+        progressDescriptor: 'levels',
+        totalLevels: 12,
+      });
+      const fallback = provider.getProgress({
+        ...sampleDescriptor,
+        progressDescriptor: 'custom-unknown',
+      });
+
+      // Assert
+      expect(best).toEqual({ kind: 'NONE' });
+      expect(levels).toEqual({ kind: 'LEVELS', completed: 0, total: 12 });
+      expect(fallback).toEqual({ kind: 'NONE' });
+    });
+  });
+
+  describe.each<{ name: string; create: () => IHomeSessionReader }>([
+    {
+      name: 'InMemoryHomeSessionReader',
+      create: () => new InMemoryHomeSessionReader(),
+    },
+  ])('IHomeSessionReader contract: $name', ({ create }) => {
+    it('should_return_consistent_session_snapshot_when_queried', () => {
+      // Arrange
+      const reader = create();
+
+      // Act
+      const snapshot = reader.getSnapshot();
+
+      // Assert
+      expect(typeof snapshot.isAuthenticated).toBe('boolean');
+      expect(snapshot.displayName === null || typeof snapshot.displayName === 'string').toBe(true);
     });
   });
 });

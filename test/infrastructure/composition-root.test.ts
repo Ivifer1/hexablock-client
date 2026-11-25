@@ -1,6 +1,8 @@
 import { CompositionRoot } from '../../src/infrastructure/CompositionRoot';
 import type { GameModeDescriptor } from '../../src/application/modes';
 import type { HomeDestination } from '../../src/application/ports';
+import { DEFAULT_HOME_MODE_REGISTRATIONS, type GameModeRegistration } from '../../src/infrastructure/homeModeRegistrations';
+import { BlockIcon } from '../../src/infrastructure/mode-icons';
 
 const descriptor: GameModeDescriptor = {
   id: 'hexa-fit',
@@ -63,5 +65,30 @@ describe('CompositionRoot', () => {
     expect(root.homeSelectionPreference.load()).toBe('hexa-levels');
     expect(root.homeOutput.current?.selectedModeId).toBe('hexa-levels');
     expect(navigatedTo).toBe('LEVELS');
+  });
+
+  it('should_wire_unified_mode_registrations_including_fifth_variant_without_modifying_composition_root', () => {
+    // Arrange
+    const fifthRegistration: GameModeRegistration = {
+      descriptor: {
+        ...descriptor,
+        id: 'hexa-fill',
+        previewKey: 'hexa-fill-preview',
+        iconKey: 'hexa-fill-icon',
+      },
+      icon: BlockIcon,
+      preview: { kind: 'svg', xml: '<svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" /></svg>' },
+    };
+
+    // Act
+    const root = new CompositionRoot([...DEFAULT_HOME_MODE_REGISTRATIONS, fifthRegistration]);
+    root.initializeHome();
+
+    // Assert
+    expect(root.modeRegistry.findAll()).toHaveLength(5);
+    expect(root.modeIconResolver.resolve('hexa-fill-icon')).toBe(BlockIcon);
+    expect(root.previewAssetResolver.resolve('hexa-fill-preview')).toEqual(fifthRegistration.preview);
+    expect(root.modeIconResolver.resolve('lines')).toBeTruthy();
+    expect(root.previewAssetResolver.resolve('lines')).toBeTruthy();
   });
 });
