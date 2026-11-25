@@ -1,7 +1,7 @@
 import type { ITextCatalog, SupportedLocale } from '../../application/ports';
 import type { I18nKeyDTO } from '../../application/value-objects';
 
-export type TranslationDictionary = Readonly<Record<string, Readonly<Record<SupportedLocale, string>>>>;
+export type TranslationDictionary = Readonly<Record<string, Readonly<Record<string, string>>>>;
 
 /**
  * Resolves i18n keys against an injected static dictionary and interpolates `{param}` tokens.

@@ -19,6 +19,13 @@ export type {
 } from './level-selection.dto';
 export type { ScreenLoadState } from './screen-load-state';
 export type {
+  LocaleCode,
+  LocaleOptionDTO,
+  SettingsEntryOrigin,
+  SettingsSessionDTO,
+  SettingsViewDTO,
+} from './settings.dto';
+export type {
   VictoryAction,
   VictoryMetricDTO,
   VictoryResultSummary,

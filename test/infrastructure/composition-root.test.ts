@@ -1,3 +1,4 @@
+import { StaticLocaleCatalog } from '../../src/adapters/i18n';
 import { CompositionRoot } from '../../src/infrastructure/CompositionRoot';
 import type { GameModeDescriptor } from '../../src/application/modes';
 import type { HomeDestination, ThemeMode } from '../../src/application/ports';
@@ -110,5 +111,33 @@ describe('CompositionRoot', () => {
     expect(root.themeController.getMode()).toBe('dark');
     expect(root.themePreference.load()).toBe('dark');
     expect(observed).toEqual(['dark']);
+  });
+
+  it('should_wire_settings_controllers_locale_controller_and_third_locale_when_created', () => {
+    // Arrange
+    const root = new CompositionRoot(DEFAULT_HOME_MODE_REGISTRATIONS, undefined, undefined, {
+      initialLocale: 'es',
+      appVersion: '2.0.0',
+      localeCatalog: new StaticLocaleCatalog([
+        { code: 'es', nativeName: 'Español' },
+        { code: 'en', nativeName: 'English' },
+        { code: 'fr', nativeName: 'Français' },
+      ]),
+    });
+
+    // Act
+    root.initializeSettings('HOME');
+    root.settingsPreferencesController.selectLocale('fr');
+    root.settingsPreferencesController.setDarkMode(true);
+
+    // Assert
+    expect(root.settingsOutput.current?.activeLocale).toBe('fr');
+    expect(root.localeController.getLocale()).toBe('fr');
+    expect(root.themeController.getMode()).toBe('dark');
+    expect(root.settingsOutput.current?.versionLabel).toEqual({
+      key: 'settings.version_badge',
+      parameters: { version: '2.0.0' },
+    });
+    expect(root.settingsOutput.current?.locales).toHaveLength(3);
   });
 });

@@ -84,11 +84,14 @@ Versión 0.1 · 2026-11-01 · Fuente única de textos para las pantallas 01 a 09
 | `settings.title` | Ajustes | Settings |
 | `settings.music` | Música | Music |
 | `settings.sfx` | Efectos de sonido | Sound effects |
+| `settings.appearance` | Apariencia | Appearance |
+| `settings.dark_mode` | Modo oscuro | Dark mode |
 | `settings.language` | Idioma | Language |
 | `settings.account` | Cuenta | Account |
 | `settings.logout` | Cerrar sesión | Sign out |
 | `settings.logout_confirm` | ¿Cerrar sesión? | Sign out? |
 | `settings.version` | Versión {version} | Version {version} |
+| `settings.version_badge` | v{version} | v{version} |
 | `settings.error_save` | No se pudo guardar el cambio | The change couldn't be saved |
 | `lang.es` | Español | Español |
 | `lang.en` | English | English |

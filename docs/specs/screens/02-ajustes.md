@@ -18,9 +18,10 @@ Permite silenciar música y efectos, cambiar de idioma y, si hay cuentas, gestio
 | AJU-01 | Encabezado con botón volver | Encabezado | Sí | `settings.title`, `common.back` | Vuelve a la pantalla de origen |
 | AJU-02 | Interruptor de música | Interruptor | Sí (SUI-03) | `settings.music` | Al apagarlo, la música se detiene al instante |
 | AJU-03 | Interruptor de efectos de sonido | Interruptor | Sí (SUI-03) | `settings.sfx` | Al apagarlo, ningún efecto suena. Al encenderlo puede sonar un efecto breve de confirmación |
-| AJU-04 | Selector de idioma | Lista de opciones excluyentes | Sí (SUI-04) | `settings.language`, `lang.es`, `lang.en` | Cada idioma aparece con su propio nombre, sin traducir. El cambio se aplica al instante |
-| AJU-05 | Sección de cuenta | Bloque | Condicionado a P-18 | `settings.account`, `common.sign_in`, `settings.logout` | Sin sesión: botón para ir a Login. Con sesión: nombre de usuario y botón de cerrar sesión |
-| AJU-06 | Versión de la app | Texto pequeño al pie | Opcional | `settings.version` | Solo informativo |
+| AJU-03b | Interruptor de modo oscuro | Interruptor | Confirmado | `settings.appearance`, `settings.dark_mode` | Cambia el tema claro/oscuro de la aplicación al instante sin reiniciar |
+| AJU-04 | Selector de idioma | Lista de opciones excluyentes | Sí (SUI-04) | `settings.language`, `lang.es`, `lang.en` | Cada idioma aparece con su propio nombre, sin traducir, y un icono vectorial plano (sin banderas ni emojis). El cambio se aplica al instante |
+| AJU-05 | Sección de cuenta | Bloque | Confirmado (P-18) | `settings.account`, `common.sign_in`, `settings.logout` | Sin sesión: botón primario de Iniciar sesión coherente con Inicio para ir a Login. Con sesión: nombre de usuario y botón de cerrar sesión |
+| AJU-06 | Versión de la app | Insignia junto al título `Ajustes` | Opcional | `settings.version_badge` | Solo informativo (`v{version}`) a la derecha del título del encabezado |
 
 **No incluir hasta decidir (P-17):** borrar progreso, créditos, y controles de volumen. Si se añade "Borrar progreso", necesita un diálogo de confirmación.
 
@@ -53,7 +54,7 @@ Permite silenciar música y efectos, cambiar de idioma y, si hay cuentas, gestio
 
 ## Navegación
 
-- Desde Inicio: volver lleva a Inicio. Desde Pausa: volver lleva a Pausa, con la partida intacta.
+- Desde Inicio: volver lleva a Inicio y se muestra el menú inferior con Ajustes activo. Desde Pausa: volver lleva a Pausa, con la partida intacta y el menú inferior oculto.
 - "Atrás" del sistema: igual que el botón volver.
 
 ## Criterios de aceptación
