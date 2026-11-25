@@ -11,7 +11,7 @@ description: Create Conventional Commits (in English) for the current change and
    Add the trailer `Assisted-by: Claude Code (<model>)` when AI wrote significant parts.
 3. Never commit on `main`, never `--no-verify`, never amend pushed commits.
 4. Ask the team before pushing. Then `git push -u origin <branch>`.
-5. Create the PR with `gh pr create --base main --title "<conventional title>" --body-file <tmp file>`. Build the body from
+5. Create the PR targeting `dev` (never open feature PRs directly against `main`; promote `dev` → `main` separately): `gh pr create --base dev --title "<conventional title>" --body-file <tmp file>`. Build the body from
    `.github/pull_request_template.md`, filling each section from the change record (spec, design rationale, SOLID, patterns,
    tests, AI usage). Ask the team before running it.
 6. Reply in Spanish with the PR link and what reviewers should look at first. Merging is a human decision.

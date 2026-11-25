@@ -20,7 +20,7 @@ Stack: Expo + React Native + TypeScript (strict), Jest (jest-expo), ESLint, Node
 5. **Infrastructure is a Detail:** External concerns (storage, clock, randomness, audio) are reached strictly via domain ports (`IProgressRepository`). The random source must be injectable and seeded for reproducible tests.
 6. **AOP without Libraries:** Cross-cutting concerns (logging, timing, errors) are implemented using Decorators/Proxies around use cases.
 7. **Testing Standards:** AAA pattern, named `should_<expected>_when_<condition>`. Engine is tested with fake cell types.
-8. **Git Workflow:** Feature branch per change, Conventional Commits in English, PR to `main`.
+8. **Git Workflow:** Feature branch per change, Conventional Commits in English, PR to `dev` first (never open feature PRs directly to `main`; only promote `dev` → `main`).
 9. **AI Transparency & Anomaly Tracking:** Record all AI contributions in change records and `AI_USAGE.md`. Every entry MUST document any incorrect suggestions, antipatterns, or bugs proposed by the AI and how the team caught and corrected them.
 10. **Three-Gate Quality Checklists:** Strict adherence to `.agents/checklists/`:
     - Gate 1: `pre_implementation.md` (Design proposal approved by human BEFORE editing `src/**`).
@@ -52,5 +52,5 @@ End code modifications with `## Explicación del cambio` covering:
 - Domain terms in inner layers (`board`, `piece`, `line`, `merge`).
 
 ## Critical Prohibitions
-- Never commit/push directly to `main` or force-push.
+- Never commit/push directly to `main`, open feature PRs directly to `main`, or force-push.
 - Never edit lint rules, harness configs, or skip tests to bypass checks.
