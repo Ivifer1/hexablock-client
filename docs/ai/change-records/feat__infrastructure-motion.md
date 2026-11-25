@@ -1,6 +1,6 @@
 # Change record: feat/infrastructure-motion
 
-Status: PROPOSED
+Status: APPROVED
 <!-- Only a human changes this line to "Status: APPROVED" (hooks block the agent from doing it). -->
 Author(s): Leonardo Ibarra with Antigravity
 Date: 2026-11-25
