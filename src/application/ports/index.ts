@@ -6,3 +6,5 @@ export type { IHomeProgressProvider } from './IHomeProgressProvider';
 export type { IHomeSelectionPreference } from './IHomeSelectionPreference';
 export type { HomeSessionSnapshot, IHomeSessionReader } from './IHomeSessionReader';
 export type { ITextCatalog, SupportedLocale } from './ITextCatalog';
+export type { IThemeController } from './IThemeController';
+export type { IThemePreference, ThemeMode } from './IThemePreference';

@@ -11,3 +11,5 @@ export { InMemoryHomeSessionReader } from './InMemoryHomeSessionReader';
 export type { HomeDestination } from './HomeController';
 export { HomeController } from './HomeController';
 export { HomeSelectionPreference } from './HomeSelectionPreference';
+export { InMemoryThemePreference } from './InMemoryThemePreference';
+export { ThemeController } from './ThemeController';

@@ -1,6 +1,6 @@
 import { createElement } from 'react';
 import { AccessibilityInfo, View as mockRNView } from 'react-native';
-import { fireEvent, render, waitFor } from '@testing-library/react-native';
+import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
 import { StaticTextCatalog } from '../../src/adapters/i18n';
 import { InMemoryHomeSessionReader } from '../../src/adapters/presentation';
 import type { HomeDestination, SupportedLocale } from '../../src/application/ports';
@@ -12,6 +12,7 @@ import {
 } from '../../src/infrastructure/homeModeRegistrations';
 import { HOME_TEXT_CATALOG } from '../../src/infrastructure/i18n/homeTranslations';
 import { BlockIcon } from '../../src/infrastructure/mode-icons';
+import { BUTTON_SIZES, DARK_THEME, LIGHT_THEME } from '../../src/infrastructure/theme';
 
 const mockCreateElement = createElement;
 
@@ -63,6 +64,7 @@ describe('HomeScreen UI (UC-005 & UC-006)', () => {
         view={view}
         controller={root.homeController}
         textCatalog={root.textCatalog}
+        themeController={root.themeController}
         locale={options.locale ?? 'es'}
         modeIconResolver={root.modeIconResolver}
         previewResolver={root.previewAssetResolver}
@@ -76,6 +78,7 @@ describe('HomeScreen UI (UC-005 & UC-006)', () => {
           view={latestView}
           controller={root.homeController}
           textCatalog={root.textCatalog}
+          themeController={root.themeController}
           locale={nextLocale ?? options.locale ?? 'es'}
           modeIconResolver={root.modeIconResolver}
           previewResolver={root.previewAssetResolver}
@@ -208,9 +211,14 @@ describe('HomeScreen UI (UC-005 & UC-006)', () => {
 
   it('should_open_login_when_session_indicator_is_tapped_without_session', async () => {
     // Arrange
-    const { getByTestId, navigated } = await renderHome({ isAuthenticated: false });
+    const { getByLabelText, getByTestId, getByText, queryByTestId, navigated } = await renderHome({
+      isAuthenticated: false,
+    });
 
-    // Act
+    // Assert & Act
+    expect(getByText('Iniciar sesión')).toBeTruthy();
+    expect(getByLabelText('Iniciar sesión')).toBeTruthy();
+    expect(queryByTestId('home-session-active-dot')).toBeNull();
     await fireEvent.press(getByTestId('home-session-button'));
 
     // Assert
@@ -221,18 +229,60 @@ describe('HomeScreen UI (UC-005 & UC-006)', () => {
 
   it('should_open_ranking_when_session_indicator_is_tapped_with_session', async () => {
     // Arrange
-    const { getByText, getByTestId, navigated } = await renderHome({
+    const { getByLabelText, getByTestId, getByText, navigated } = await renderHome({
       isAuthenticated: true,
       displayName: 'Leonardo',
     });
 
     // Assert label & Act
     expect(getByText('Hola, Leonardo')).toBeTruthy();
+    expect(getByLabelText('Hola, Leonardo')).toBeTruthy();
+    expect(getByTestId('home-session-active-dot')).toBeTruthy();
     await fireEvent.press(getByTestId('home-session-button'));
 
     await waitFor(() => {
       expect(navigated).toEqual(['RANKING']);
     });
+  });
+
+  it('should_render_home_without_scroll_view_when_home_loads', async () => {
+    // Arrange
+    const hasScrollViewNode = (node: unknown): boolean => {
+      if (!node || typeof node !== 'object') return false;
+      if (Array.isArray(node)) return node.some((child) => hasScrollViewNode(child));
+      const element = node as { readonly type?: unknown; readonly children?: unknown };
+      if (element.type === 'RCTScrollView' || element.type === 'ScrollView') return true;
+      return Array.isArray(element.children)
+        ? element.children.some((child) => hasScrollViewNode(child))
+        : false;
+    };
+
+    // Act
+    const { toJSON } = await renderHome();
+
+    // Assert
+    expect(hasScrollViewNode(toJSON())).toBe(false);
+  });
+
+  it('should_render_integrated_mode_labels_on_wheel_slots_when_home_loads', async () => {
+    // Arrange & Act
+    const { getByTestId } = await renderHome();
+    const extractText = (node: ReturnType<typeof getByTestId>): string => {
+      const children = node.props.children;
+      if (typeof children === 'string') return children;
+      if (Array.isArray(children)) {
+        return children.map((child) => (typeof child === 'string' ? child : extractText(child))).join('');
+      }
+      return children && typeof children === 'object' && 'props' in children
+        ? extractText(children as ReturnType<typeof getByTestId>)
+        : '';
+    };
+
+    // Assert
+    expect(extractText(getByTestId('wheel-mode-label-lines'))).toBe('LINES');
+    expect(extractText(getByTestId('wheel-mode-label-merge'))).toBe('MERGE');
+    expect(extractText(getByTestId('wheel-mode-label-fit'))).toBe('FIT');
+    expect(extractText(getByTestId('wheel-mode-label-sort'))).toBe('SORT');
   });
 
   it('should_render_points_play_settings_and_block_unavailable_points_when_menu_is_used', async () => {
@@ -268,8 +318,56 @@ describe('HomeScreen UI (UC-005 & UC-006)', () => {
       expect(getByText('What shall we play today?')).toBeTruthy();
       expect(getByText('Direct play')).toBeTruthy();
       expect(getByText('Play Hexa Lines')).toBeTruthy();
+      expect(getByText('Sign in')).toBeTruthy();
       expect(getByText('Settings')).toBeTruthy();
       expect(getByText('Points')).toBeTruthy();
     });
+  });
+
+  it('should_not_render_theme_toggle_and_sync_external_theme_changes_when_home_is_rendered', async () => {
+    // Arrange
+    const { queryByLabelText, root, toJSON } = await renderHome({ locale: 'es' });
+    const rootBg = () =>
+      (toJSON() as { readonly props?: { readonly style?: { readonly backgroundColor?: string } } })
+        ?.props?.style?.backgroundColor;
+
+    expect(queryByLabelText('Cambiar a modo oscuro')).toBeNull();
+    expect(queryByLabelText('Cambiar a modo claro')).toBeNull();
+    expect(rootBg()).toBe(LIGHT_THEME.bg);
+
+    // Act: external controller (e.g. Settings) changes theme to dark
+    await act(async () => {
+      root.themeController.setMode('dark');
+    });
+
+    // Assert Home stays synchronized
+    await waitFor(() => {
+      expect(root.themeController.getMode()).toBe('dark');
+      expect(rootBg()).toBe(DARK_THEME.bg);
+    });
+  });
+
+  it('should_render_session_button_with_small_size_token_when_home_loads', async () => {
+    // Arrange & Act
+    const { getByTestId, getByText } = await renderHome({ isAuthenticated: false });
+    const sessionButton = getByTestId('home-session-button');
+    const sessionText = getByText('Iniciar sesión');
+    const flattenStyle = (style: unknown): Record<string, unknown> => {
+      if (!style) return {};
+      if (Array.isArray(style)) {
+        return style.reduce<Record<string, unknown>>(
+          (acc, entry) => ({ ...acc, ...flattenStyle(entry) }),
+          {},
+        );
+      }
+      return typeof style === 'object' ? (style as Record<string, unknown>) : {};
+    };
+
+    const buttonStyle = flattenStyle(sessionButton.props.style);
+    const labelStyle = flattenStyle(sessionText.props.style);
+
+    // Assert
+    expect(Number(buttonStyle.minHeight)).toBeLessThan(BUTTON_SIZES.m.minHeight);
+    expect(Number(labelStyle.fontSize)).toBeLessThan(BUTTON_SIZES.m.fontSize);
   });
 });

@@ -124,9 +124,17 @@ export function WheelModeSlot({
     }).start();
   }, [isSelected, idleScale, reduceMotion, scaleAnim]);
 
-  const labelBand = 26;
+  const idleLabelLift = -(selectedModeIconSize - modeIconSize) / 2;
+  const labelTranslateY =
+    idleScale < 1
+      ? scaleAnim.interpolate({
+          inputRange: [idleScale, 1],
+          outputRange: [idleLabelLift, 0],
+        })
+      : 0;
+
   const slotWidth = Math.max(selectedModeIconSize + 18, 78);
-  const slotHeight = selectedModeIconSize + labelBand * 2;
+  const slotHeight = selectedModeIconSize + 18;
   const baseAngle = modeBaseAngleRad(index, totalModes);
   const radius = wheelSize * 0.41;
   const centerX = wheelSize / 2;
@@ -164,60 +172,75 @@ export function WheelModeSlot({
             pressed && slotStyles.pressedScale,
           ]}
         >
-          <View style={{ height: labelBand }} />
-          <Animated.View
+          <View
             style={[
-              styles.modeHexBase,
-              {
-                width: selectedModeIconSize,
-                height: selectedModeIconSize,
-                borderRadius: selectedModeIconSize / 2,
-                borderColor: isSelected ? theme.primary : theme.borderDefault,
-                borderWidth: isSelected ? BORDER_WIDTH.chunky : BORDER_WIDTH.thin,
-                shadowColor: isSelected ? theme.primary : theme.shadowLow.shadowColor,
-                shadowOpacity: isSelected ? 0.35 : theme.shadowLow.shadowOpacity,
-                shadowRadius: isSelected ? 14 : theme.shadowLow.shadowRadius,
-                shadowOffset: isSelected
-                  ? { width: 0, height: 6 }
-                  : theme.shadowLow.shadowOffset,
-                elevation: isSelected ? 8 : 2,
-                transform: [{ scale: scaleAnim }],
-              },
+              slotStyles.circleCluster,
+              { width: slotWidth, height: selectedModeIconSize },
             ]}
           >
-            {renderModeIcon(
-              mode,
-              isSelected ? theme.primary : theme.textSecondary,
-              selectedModeIconSize * 0.7,
-              isSelected,
-              modeIconResolver,
-            )}
-          </Animated.View>
-          <View style={[slotStyles.slotLabelBand, { height: labelBand }]}>
-            {isSelected ? (
-              <View
-                style={[
-                  slotStyles.selectedLabelBadge,
-                  {
-                    backgroundColor: withAlpha(
-                      theme.primary,
-                      isDark ? '33' : '1F',
-                    ),
-                  },
-                ]}
+            <Animated.View
+              style={[
+                styles.modeHexBase,
+                {
+                  width: selectedModeIconSize,
+                  height: selectedModeIconSize,
+                  borderRadius: selectedModeIconSize / 2,
+                  borderColor: isSelected ? theme.primary : theme.borderDefault,
+                  borderWidth: isSelected ? BORDER_WIDTH.chunky : BORDER_WIDTH.thin,
+                  shadowColor: isSelected ? theme.primary : theme.shadowLow.shadowColor,
+                  shadowOpacity: isSelected ? 0.35 : theme.shadowLow.shadowOpacity,
+                  shadowRadius: isSelected ? 14 : theme.shadowLow.shadowRadius,
+                  shadowOffset: isSelected
+                    ? { width: 0, height: 6 }
+                    : theme.shadowLow.shadowOffset,
+                  elevation: isSelected ? 8 : 2,
+                  transform: [{ scale: scaleAnim }],
+                },
+              ]}
+            >
+              {renderModeIcon(
+                mode,
+                isSelected ? theme.primary : theme.textSecondary,
+                selectedModeIconSize * 0.68,
+                isSelected,
+                modeIconResolver,
+              )}
+            </Animated.View>
+            <Animated.View
+              testID={`wheel-mode-label-${mode.id}`}
+              pointerEvents="none"
+              style={[
+                slotStyles.dockedLabelPill,
+                isSelected ? slotStyles.selectedLabelPill : slotStyles.idleLabelPill,
+                {
+                  backgroundColor: isSelected
+                    ? theme.primary
+                    : isDark
+                      ? theme.surfaceSubdued
+                      : theme.surface,
+                  borderColor: isSelected
+                    ? isDark
+                      ? theme.primaryHover
+                      : theme.surface
+                    : isDark
+                      ? theme.borderStrong
+                      : theme.borderDefault,
+                  elevation: isSelected ? 9 : 4,
+                  transform: [{ translateY: labelTranslateY }],
+                },
+              ]}
+            >
+              <Text
+                style={
+                  isSelected
+                    ? [slotStyles.selectedLabelText, { color: theme.primaryFg }]
+                    : [styles.idleLabelText, { color: theme.textPrimary }]
+                }
+                numberOfLines={1}
               >
-                <Text
-                  style={[slotStyles.selectedLabelText, { color: theme.primary }]}
-                  numberOfLines={1}
-                >
-                  {shortLabel}
-                </Text>
-              </View>
-            ) : (
-              <Text style={styles.idleLabelText} numberOfLines={1}>
                 {shortLabel}
               </Text>
-            )}
+            </Animated.View>
           </View>
         </Pressable>
       </Animated.View>
@@ -256,22 +279,35 @@ const slotStyles = StyleSheet.create({
     minWidth: SPACING.touchTargetMin,
     minHeight: SPACING.touchTargetMin,
   },
+  circleCluster: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'visible',
+  },
   pressedScale: {
     opacity: 0.92,
     transform: [{ scale: 0.97 }],
   },
-  slotLabelBand: {
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    paddingTop: 4,
-  },
-  selectedLabelBadge: {
-    paddingHorizontal: SPACING.s2,
-    paddingVertical: 3,
+  dockedLabelPill: {
+    position: 'absolute',
+    bottom: -7,
+    zIndex: 2,
     borderRadius: RADIUS.full,
+    borderWidth: BORDER_WIDTH.thin,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  selectedLabelPill: {
+    paddingHorizontal: SPACING.s2 + 1,
+    paddingVertical: 2,
+  },
+  idleLabelPill: {
+    paddingHorizontal: SPACING.s2,
+    paddingVertical: 1.5,
   },
   selectedLabelText: {
     fontSize: TYPOGRAPHY.overline.fontSize,
+    lineHeight: 13,
     fontWeight: '800',
     letterSpacing: 0.6,
   },
@@ -282,13 +318,15 @@ function createSlotStyles(theme: Theme) {
     modeHexBase: {
       alignItems: 'center',
       justifyContent: 'center',
+      paddingBottom: 4,
       backgroundColor: theme.surface,
     },
     idleLabelText: {
-      fontSize: TYPOGRAPHY.overline.fontSize - 1,
+      fontSize: TYPOGRAPHY.overline.fontSize,
+      lineHeight: 13,
       fontWeight: '700',
-      color: theme.textSecondary,
-      letterSpacing: 0.3,
+      color: theme.textPrimary,
+      letterSpacing: 0.4,
     },
   });
 }

@@ -138,6 +138,25 @@ export function buildThemeIconSvg(isDark: boolean, color: string, size: number):
   </svg>`;
 }
 
+export function buildSessionIconSvg(
+  hasSession: boolean,
+  color: string,
+  size: number,
+): string {
+  if (hasSession) {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none">
+      <polygon points="${hexPoints(12, 8, 3.6)}" fill="${color}"/>
+      <path d="M5.5 19.5a6.5 6.5 0 0 1 13 0" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round"/>
+    </svg>`;
+  }
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none">
+    <path d="M13 4h4.5a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H13" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M4.5 12h10.5" stroke="${color}" stroke-width="2" stroke-linecap="round"/>
+    <path d="M11 8.5 15 12l-4 3.5" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>`;
+}
+
 export function PointsMenuIcon(props: MenuIconSvgOptions) {
   return (
     <SvgXml
@@ -182,4 +201,16 @@ export function ThemeToggleIcon({
   readonly size: number;
 }) {
   return <SvgXml xml={buildThemeIconSvg(isDark, color, size)} width={size} height={size} />;
+}
+
+export function SessionActionIcon({
+  hasSession,
+  color,
+  size,
+}: {
+  readonly hasSession: boolean;
+  readonly color: string;
+  readonly size: number;
+}) {
+  return <SvgXml xml={buildSessionIconSvg(hasSession, color, size)} width={size} height={size} />;
 }

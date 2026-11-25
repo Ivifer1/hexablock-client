@@ -27,6 +27,63 @@ export const BORDER_WIDTH = {
   chunky: 3,
 } as const;
 
+export type ButtonSize = 's' | 'm' | 'l';
+
+export interface ButtonSizeMetrics {
+  readonly minHeight: number;
+  readonly fontSize: number;
+  readonly lineHeight: number;
+  readonly paddingHorizontal: number;
+  readonly paddingVertical: number;
+  readonly iconSize: number;
+  readonly gap: number;
+}
+
+export const BUTTON_SIZES: Readonly<Record<ButtonSize, ButtonSizeMetrics>> = {
+  s: {
+    minHeight: 34,
+    fontSize: 12,
+    lineHeight: 16,
+    paddingHorizontal: SPACING.s3,
+    paddingVertical: 6,
+    iconSize: 14,
+    gap: 6,
+  },
+  m: {
+    minHeight: SPACING.touchTargetMin,
+    fontSize: 14,
+    lineHeight: 20,
+    paddingHorizontal: SPACING.s4,
+    paddingVertical: 10,
+    iconSize: 16,
+    gap: SPACING.s2,
+  },
+  l: {
+    minHeight: 48,
+    fontSize: 17,
+    lineHeight: 22,
+    paddingHorizontal: SPACING.s5,
+    paddingVertical: SPACING.s3,
+    iconSize: 14,
+    gap: SPACING.s2,
+  },
+} as const;
+
+export function scaleButtonSize(size: ButtonSize, fontScale = 1): ButtonSizeMetrics {
+  const base = BUTTON_SIZES[size];
+  const minAllowedHeight = size === 's' ? 30 : SPACING.touchTargetMin;
+
+  return {
+    minHeight: Math.max(minAllowedHeight, Math.round(base.minHeight * fontScale)),
+    fontSize: Math.round(base.fontSize * fontScale),
+    lineHeight: Math.round(base.lineHeight * fontScale),
+    paddingHorizontal: Math.round(base.paddingHorizontal * fontScale),
+    paddingVertical: Math.round(base.paddingVertical * fontScale),
+    iconSize: Math.round(base.iconSize * fontScale),
+    gap: base.gap,
+  };
+}
+
 /** Soft-press and selection motion (ms). Skip non-essential motion when reduced-motion is on. */
 export const MOTION = {
   pressMs: 160,

@@ -4,7 +4,7 @@ import type { ITextCatalog, SupportedLocale } from '../../application/ports';
 import type { HomeProgressDTO, I18nKeyDTO } from '../../application/value-objects';
 import type { HomeLayoutMetrics } from '../homeLayout';
 import type { ExtendedHomeModeDTO } from '../HexModeSelector';
-import { BORDER_WIDTH, RADIUS, SPACING, TYPOGRAPHY, type Theme } from '../theme';
+import { BORDER_WIDTH, RADIUS, SPACING, TYPOGRAPHY, scaleButtonSize, type Theme } from '../theme';
 import { PlayGlyphIcon } from '../ui-icons/MenuIcons';
 
 export interface HomeModeCardProps {
@@ -78,6 +78,7 @@ export function HomeModeCard({
     { key: 'home.play_mode', parameters: { name: modeName } },
     locale,
   );
+  const playButton = scaleButtonSize('l', layout.fontScale);
 
   return (
     <Animated.View
@@ -181,17 +182,32 @@ export function HomeModeCard({
           styles.playButton,
           layout.compact && styles.playButtonCompact,
           {
-            minHeight: layout.playButtonMinHeight,
+            minHeight: playButton.minHeight,
+            paddingHorizontal: playButton.paddingHorizontal,
             backgroundColor: theme.primary,
             shadowColor: theme.primary,
           },
           pressed && styles.pressedScale,
         ]}
       >
-        <View style={styles.playButtonContent}>
-          <PlayGlyphIcon color={theme.primaryFg} size={14} />
+        <View
+          style={[
+            styles.playButtonContent,
+            {
+              gap: playButton.gap,
+              paddingVertical: playButton.paddingVertical,
+            },
+          ]}
+        >
+          <PlayGlyphIcon color={theme.primaryFg} size={playButton.iconSize} />
           <Text
-            style={[styles.playText, { fontSize: 17 * layout.fontScale }]}
+            style={[
+              styles.playText,
+              {
+                fontSize: playButton.fontSize,
+                lineHeight: playButton.lineHeight,
+              },
+            ]}
             numberOfLines={1}
             ellipsizeMode="tail"
           >
@@ -260,12 +276,10 @@ function createStyles(theme: Theme) {
       fontWeight: '600',
     },
     playButton: {
-      minHeight: SPACING.touchTargetMin,
       marginTop: SPACING.s4,
       borderRadius: RADIUS.full,
       alignItems: 'center',
       justifyContent: 'center',
-      paddingHorizontal: SPACING.s5,
       shadowOffset: { width: 0, height: 6 },
       shadowOpacity: 0.35,
       shadowRadius: 14,
@@ -282,8 +296,6 @@ function createStyles(theme: Theme) {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      gap: SPACING.s2,
-      paddingVertical: SPACING.s3,
     },
     playText: {
       color: theme.primaryFg,

@@ -1,43 +1,68 @@
 import { useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { BlockIcon } from '../mode-icons';
-import { BORDER_WIDTH, RADIUS, SPACING, type Theme } from '../theme';
-import { ThemeToggleIcon } from '../ui-icons/MenuIcons';
+import {
+  BORDER_WIDTH,
+  RADIUS,
+  SPACING,
+  scaleButtonSize,
+  type ButtonSize,
+  type Theme,
+} from '../theme';
+import { SessionActionIcon } from '../ui-icons/MenuIcons';
 
 export interface HomeHeaderProps {
   readonly title: string;
-  readonly toggleLabel: string;
+  readonly sessionLabel: string;
+  readonly hasSession: boolean;
+  readonly sessionButtonSize?: ButtonSize;
   readonly fontScale: number;
   readonly theme: Theme;
   readonly isDark: boolean;
-  readonly onToggleTheme: () => void;
+  readonly onPressSession: () => void;
+}
+
+function withAlpha(hex: string, alphaHex: string): string {
+  if (/^#[0-9A-Fa-f]{6}$/.test(hex)) return `${hex}${alphaHex}`;
+  return hex;
 }
 
 export function HomeHeader({
   title,
-  toggleLabel,
+  sessionLabel,
+  hasSession,
+  sessionButtonSize = 's',
   fontScale,
   theme,
   isDark,
-  onToggleTheme,
+  onPressSession,
 }: HomeHeaderProps) {
   const styles = useMemo(() => createStyles(theme), [theme]);
-  const brandSize = 36 * fontScale;
+  const brandSize = Math.round(30 * fontScale);
+  const sessionButton = scaleButtonSize(sessionButtonSize, fontScale);
 
   return (
     <View style={styles.header}>
       <View style={styles.brand} accessibilityRole="header">
-        <View style={{ width: brandSize, height: brandSize, alignItems: 'center', justifyContent: 'center' }}>
+        <View
+          style={{
+            width: brandSize,
+            height: brandSize,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
           <BlockIcon color="#13968A" size={brandSize} isSelected />
         </View>
         <Text
           numberOfLines={1}
           adjustsFontSizeToFit
+          minimumFontScale={0.78}
           style={[
             styles.title,
             {
-              fontSize: 22 * fontScale,
-              lineHeight: 30 * fontScale,
+              fontSize: Math.round(19 * fontScale),
+              lineHeight: Math.round(26 * fontScale),
             },
           ]}
         >
@@ -45,20 +70,55 @@ export function HomeHeader({
         </Text>
       </View>
       <Pressable
+        testID="home-session-button"
         accessibilityRole="button"
-        accessibilityLabel={toggleLabel}
-        onPress={onToggleTheme}
+        accessibilityLabel={sessionLabel}
+        onPress={onPressSession}
         hitSlop={8}
         style={({ pressed }) => [
-          styles.themeToggle,
-          pressed && styles.pressedControl,
+          styles.sessionButton,
+          {
+            minHeight: sessionButton.minHeight,
+            paddingHorizontal: sessionButton.paddingHorizontal,
+            paddingVertical: sessionButton.paddingVertical,
+            gap: sessionButton.gap,
+            backgroundColor: theme.primary,
+            borderColor: isDark ? theme.primaryHover : withAlpha(theme.primaryHover, '55'),
+          },
+          pressed && styles.sessionButtonPressed,
         ]}
       >
-        <ThemeToggleIcon
-          isDark={isDark}
-          color={isDark ? theme.warning : theme.textSecondary}
-          size={20}
+        <SessionActionIcon
+          hasSession={hasSession}
+          color={theme.primaryFg}
+          size={sessionButton.iconSize}
         />
+        <Text
+          style={[
+            styles.sessionLabel,
+            {
+              color: theme.primaryFg,
+              fontSize: sessionButton.fontSize,
+              lineHeight: sessionButton.lineHeight,
+            },
+          ]}
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
+          {sessionLabel}
+        </Text>
+        {hasSession ? (
+          <View
+            testID="home-session-active-dot"
+            style={[
+              styles.sessionActiveDot,
+              {
+                backgroundColor: theme.success,
+                borderColor: theme.bg,
+              },
+            ]}
+          />
+        ) : null}
       </Pressable>
     </View>
   );
@@ -74,25 +134,47 @@ function createStyles(theme: Theme) {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
+      gap: SPACING.s2,
     },
-    brand: { flexDirection: 'row', alignItems: 'center', gap: SPACING.s3, flexShrink: 1 },
+    brand: {
+      flex: 1,
+      minWidth: 0,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: SPACING.s2,
+    },
     title: {
       fontWeight: '800',
       color: theme.textPrimary,
       letterSpacing: -0.3,
       flexShrink: 1,
     },
-    themeToggle: {
-      width: SPACING.touchTargetMin,
-      height: SPACING.touchTargetMin,
-      borderRadius: RADIUS.full,
-      borderWidth: BORDER_WIDTH.thin,
-      borderColor: theme.borderDefault,
-      backgroundColor: theme.surface,
+    sessionButton: {
+      maxWidth: '48%',
+      flexShrink: 0,
+      flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      ...theme.shadowLow,
+      borderRadius: RADIUS.full,
+      borderWidth: BORDER_WIDTH.thick,
+      ...theme.shadowGlowPrimary,
     },
-    pressedControl: { opacity: 0.88 },
+    sessionLabel: {
+      fontWeight: '700',
+      flexShrink: 1,
+    },
+    sessionActiveDot: {
+      position: 'absolute',
+      top: -2,
+      right: -2,
+      width: 11,
+      height: 11,
+      borderRadius: RADIUS.full,
+      borderWidth: BORDER_WIDTH.thick,
+    },
+    sessionButtonPressed: {
+      opacity: 0.9,
+      transform: [{ scale: 0.96 }],
+    },
   });
 }

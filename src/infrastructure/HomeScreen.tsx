@@ -4,7 +4,6 @@ import {
   Animated,
   Platform,
   SafeAreaView,
-  ScrollView,
   StatusBar as RNStatusBar,
   StyleSheet,
   Text,
@@ -16,6 +15,7 @@ import type {
   IAssetResolver,
   IHomeController,
   ITextCatalog,
+  IThemeController,
   SupportedLocale,
 } from '../application/ports';
 import type { HomeModeDTO, HomeViewDTO } from '../application/value-objects';
@@ -24,7 +24,6 @@ import type { HomePreviewAsset } from './home-previews';
 import { HomeBottomMenu, type HomeMenuItemKey } from './home/HomeBottomMenu';
 import { HomeHeader } from './home/HomeHeader';
 import { HomeModeCard } from './home/HomeModeCard';
-import { HomeSessionBar } from './home/HomeSessionBar';
 import { computeHomeLayoutMetrics } from './homeLayout';
 import type { ModeIconComponent } from './mode-icons';
 import { MOTION, RADIUS, SPACING, TYPOGRAPHY, useTheme, type Theme } from './theme';
@@ -37,6 +36,7 @@ export interface HomeScreenProps {
   readonly view: HomeViewDTO;
   readonly controller: IHomeController;
   readonly textCatalog: ITextCatalog;
+  readonly themeController?: IThemeController;
   readonly locale?: SupportedLocale;
   readonly modeIconResolver?: IAssetResolver<ModeIconComponent>;
   readonly previewResolver?: IAssetResolver<HomePreviewAsset>;
@@ -51,11 +51,12 @@ export function HomeScreen({
   view,
   controller,
   textCatalog,
+  themeController,
   locale = 'es',
   modeIconResolver,
   previewResolver,
 }: HomeScreenProps) {
-  const { theme, isDark, toggleTheme } = useTheme();
+  const { theme, isDark } = useTheme(themeController);
   const styles = useMemo(() => createStyles(theme), [theme]);
   const { width: viewportWidth, height: viewportHeight } = useWindowDimensions();
   const [reduceMotion, setReduceMotion] = useState(false);
@@ -139,32 +140,32 @@ export function HomeScreen({
       </View>
 
       <View style={styles.content}>
-        <ScrollView
-          style={styles.scrollArea}
-          contentContainerStyle={[
-            styles.scrollContent,
+        <View
+          style={[
+            styles.bodyArea,
             {
               paddingHorizontal: layout.horizontalPadding,
               paddingTop: layout.topSafeInset,
-              paddingBottom: layout.compact ? SPACING.s2 : SPACING.s3,
+              paddingBottom: layout.bodyPaddingBottom,
             },
           ]}
-          showsVerticalScrollIndicator={false}
-          bounces={false}
         >
           <HomeHeader
             title={textCatalog.resolve(view.title, locale)}
-            toggleLabel={textCatalog.resolve(
-              isDark ? 'home.theme_toggle_light' : 'home.theme_toggle_dark',
-              locale,
-            )}
+            sessionLabel={textCatalog.resolve(view.sessionLabel, locale)}
+            hasSession={view.hasSession}
             fontScale={layout.fontScale}
             theme={theme}
             isDark={isDark}
-            onToggleTheme={toggleTheme}
+            onPressSession={() => controller.openSession(view.hasSession)}
           />
 
-          <View style={[styles.mainBody, layout.compact && styles.mainBodyCompact]}>
+          <View
+            style={[
+              styles.mainBody,
+              { paddingVertical: layout.mainBodyPaddingVertical },
+            ]}
+          >
             <Text
               accessibilityRole="header"
               style={[
@@ -231,17 +232,8 @@ export function HomeScreen({
                 ) : null}
               </>
             )}
-
-            <HomeSessionBar
-              label={textCatalog.resolve(view.sessionLabel, locale)}
-              hasSession={view.hasSession}
-              theme={theme}
-              isDark={isDark}
-              fontScale={layout.fontScale}
-              onPress={() => controller.openSession(view.hasSession)}
-            />
           </View>
-        </ScrollView>
+        </View>
 
         <HomeBottomMenu
           selectedMenu={selectedMenu}
@@ -305,19 +297,18 @@ function createStyles(theme: Theme) {
       width: '100%',
       alignSelf: 'center',
     },
+    bodyArea: {
+      flex: 1,
+      width: '100%',
+      overflow: 'hidden',
+    },
     mainBody: {
       flex: 1,
       width: '100%',
       maxWidth: 480,
       alignSelf: 'center',
       justifyContent: 'center',
-      paddingVertical: SPACING.s3,
     },
-    mainBodyCompact: {
-      paddingVertical: SPACING.s2,
-    },
-    scrollArea: { flex: 1, width: '100%' },
-    scrollContent: { flexGrow: 1 },
     heroTitle: {
       marginTop: 0,
       textAlign: 'center',

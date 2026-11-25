@@ -1,6 +1,6 @@
 import { CompositionRoot } from '../../src/infrastructure/CompositionRoot';
 import type { GameModeDescriptor } from '../../src/application/modes';
-import type { HomeDestination } from '../../src/application/ports';
+import type { HomeDestination, ThemeMode } from '../../src/application/ports';
 import { DEFAULT_HOME_MODE_REGISTRATIONS, type GameModeRegistration } from '../../src/infrastructure/homeModeRegistrations';
 import { BlockIcon } from '../../src/infrastructure/mode-icons';
 
@@ -90,5 +90,24 @@ describe('CompositionRoot', () => {
     expect(root.previewAssetResolver.resolve('hexa-fill-preview')).toEqual(fifthRegistration.preview);
     expect(root.modeIconResolver.resolve('lines')).toBeTruthy();
     expect(root.previewAssetResolver.resolve('lines')).toBeTruthy();
+  });
+
+  it('should_expose_shared_theme_controller_when_composition_root_is_created', () => {
+    // Arrange
+    const root = new CompositionRoot(DEFAULT_HOME_MODE_REGISTRATIONS, undefined, undefined, {
+      initialThemeMode: 'light',
+    });
+    const observed: ThemeMode[] = [];
+    const unsubscribe = root.themeController.subscribe((mode) => observed.push(mode));
+
+    // Act
+    const nextMode = root.themeController.toggleTheme();
+    unsubscribe();
+
+    // Assert
+    expect(nextMode).toBe('dark');
+    expect(root.themeController.getMode()).toBe('dark');
+    expect(root.themePreference.load()).toBe('dark');
+    expect(observed).toEqual(['dark']);
   });
 });

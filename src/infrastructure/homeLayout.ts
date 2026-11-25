@@ -1,4 +1,4 @@
-import { SPACING } from './theme';
+import { SPACING, scaleButtonSize } from './theme';
 
 export interface HomeLayoutMetrics {
   readonly compact: boolean;
@@ -11,6 +11,8 @@ export interface HomeLayoutMetrics {
   readonly menuHeight: number;
   readonly topSafeInset: number;
   readonly bottomSafeInset: number;
+  readonly bodyPaddingBottom: number;
+  readonly mainBodyPaddingVertical: number;
   readonly menuIconSize: number;
   readonly cardPadding: number;
   readonly wheelSize: number;
@@ -23,6 +25,7 @@ export interface HomeLayoutMetrics {
   readonly descriptionLineHeight: number;
   readonly descriptionHeight: number;
   readonly playButtonMinHeight: number;
+  readonly estimatedTotalHeight: number;
 }
 
 export function computeHomeLayoutMetrics(
@@ -43,31 +46,22 @@ export function computeHomeLayoutMetrics(
   const menuHeight = narrow || compact ? 64 : wide ? 72 : 68;
   const topSafeInset =
     platformOS === 'android'
-      ? androidStatusBarHeight + (compact ? SPACING.s4 : SPACING.s6)
+      ? androidStatusBarHeight + (compact ? SPACING.s2 : SPACING.s4)
       : compact
-        ? SPACING.s6
+        ? SPACING.s3
         : wide
-          ? SPACING.s12
-          : SPACING.s12 + SPACING.s2;
+          ? SPACING.s6
+          : SPACING.s4;
   const bottomSafeInset =
     platformOS === 'android'
       ? SPACING.s8
       : compact
         ? SPACING.s4
         : SPACING.s5;
+  const bodyPaddingBottom = compact ? SPACING.s2 : SPACING.s3;
+  const mainBodyPaddingVertical = compact ? SPACING.s1 : SPACING.s2;
   const menuIconSize = narrow ? 22 : wide ? 28 : 24;
-  const cardPadding = narrow || compact ? SPACING.s4 : SPACING.s5;
-
-  const slotWidth = Math.max(selectedModeIconSize + 18, 78);
-  const availableWidth = Math.max(160, viewportWidth - horizontalPadding * 2);
-  const maxWheelByWidth = Math.floor((availableWidth - slotWidth) / 0.82);
-  const availableBodyHeight = Math.max(300, viewportHeight - (menuHeight + bottomSafeInset));
-  const maxWheelByHeight = Math.round(
-    availableBodyHeight * (compact ? 0.28 : wide ? 0.30 : 0.34),
-  );
-  const targetWheel = wide ? 268 : narrow ? 208 : 248;
-  const wheelSize = Math.max(148, Math.min(targetWheel, maxWheelByWidth, maxWheelByHeight));
-  const selectorHeight = Math.round(wheelSize + selectedModeIconSize * 0.95);
+  const cardPadding = narrow || compact ? SPACING.s3 : SPACING.s5;
 
   const cardTitleFontSize = Math.round(22 * fontScale);
   const cardTitleLineHeight = Math.round(28 * fontScale);
@@ -76,7 +70,49 @@ export function computeHomeLayoutMetrics(
   const descriptionFontSize = Math.round(Math.max(13, 15 * fontScale));
   const descriptionLineHeight = Math.round(Math.max(18, 22 * fontScale));
   const descriptionHeight = descriptionLineHeight * 2;
-  const playButtonMinHeight = Math.max(SPACING.touchTargetMin, Math.round(48 * fontScale));
+  const playButtonMinHeight = scaleButtonSize('l', fontScale).minHeight;
+
+  const slotWidth = Math.max(selectedModeIconSize + 18, 78);
+  const availableWidth = Math.max(160, viewportWidth - horizontalPadding * 2);
+  const maxWheelByWidth = Math.floor((availableWidth - slotWidth) / 0.82);
+  const availableBodyHeight = Math.max(300, viewportHeight - (menuHeight + bottomSafeInset));
+
+  const headerHeight = SPACING.touchTargetMin;
+  const heroTitleLineHeight = (narrow ? 28 : 34) * fontScale;
+  const heroSubtitleHeight = (compact ? SPACING.s1 / 2 : SPACING.s1) + (narrow ? 16 : 20);
+  const selectorMarginVertical = (narrow || compact ? SPACING.s2 : SPACING.s4) + SPACING.s2;
+  const cardMarginTop = compact ? SPACING.s2 : SPACING.s3;
+  const entryKindBadgeHeight = SPACING.s1 + Math.ceil(11 * fontScale * 1.4) + 6;
+  const playButtonMarginTop = compact ? SPACING.s3 : SPACING.s4;
+  const estimatedCardHeight =
+    cardMarginTop +
+    cardPadding * 2 +
+    cardHeaderMinHeight +
+    entryKindBadgeHeight +
+    SPACING.s2 +
+    descriptionHeight +
+    playButtonMarginTop +
+    playButtonMinHeight +
+    2;
+  const fixedVerticalHeight =
+    topSafeInset +
+    bodyPaddingBottom +
+    headerHeight +
+    mainBodyPaddingVertical * 2 +
+    heroTitleLineHeight +
+    heroSubtitleHeight +
+    selectorMarginVertical +
+    estimatedCardHeight;
+  const maxSelectorByHeight = availableBodyHeight - Math.ceil(fixedVerticalHeight);
+  const maxWheelByHeight = Math.floor(
+    maxSelectorByHeight - Math.ceil(selectedModeIconSize * 0.95),
+  );
+  const targetWheel = wide ? 268 : narrow ? 208 : 248;
+  const wheelSize = Math.max(112, Math.min(targetWheel, maxWheelByWidth, maxWheelByHeight));
+  const selectorHeight = Math.round(wheelSize + selectedModeIconSize * 0.95);
+  const estimatedTotalHeight = Math.ceil(
+    fixedVerticalHeight + selectorHeight + menuHeight + bottomSafeInset,
+  );
 
   return {
     compact,
@@ -89,6 +125,8 @@ export function computeHomeLayoutMetrics(
     menuHeight,
     topSafeInset,
     bottomSafeInset,
+    bodyPaddingBottom,
+    mainBodyPaddingVertical,
     menuIconSize,
     cardPadding,
     wheelSize,
@@ -101,5 +139,6 @@ export function computeHomeLayoutMetrics(
     descriptionLineHeight,
     descriptionHeight,
     playButtonMinHeight,
+    estimatedTotalHeight,
   };
 }
