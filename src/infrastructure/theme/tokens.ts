@@ -81,13 +81,6 @@ export const TYPOGRAPHY = {
   },
 } as const;
 
-export const GAME_COLORS = {
-  lines: '#0891B2', // Cyan
-  fit: '#D97706',   // Ámbar
-  sort: '#7C3AED',  // Violeta
-  merge: '#059669', // Esmeralda
-} as const;
-
 export const LIGHT_THEME = {
   bg: '#F6F4ED',
   surface: '#FFFFFF',
@@ -110,8 +103,6 @@ export const LIGHT_THEME = {
   success: '#16A34A',
   danger: '#DC2626',
   warning: '#D97706',
-
-  game: GAME_COLORS,
 
   shadowLow: {
     shadowColor: '#1E2229',
@@ -166,13 +157,6 @@ export const DARK_THEME = {
   success: '#22C55E',
   danger: '#EF4444',
   warning: '#F59E0B',
-
-  game: {
-    lines: '#06B6D4',
-    fit: '#F59E0B',
-    sort: '#8B5CF6',
-    merge: '#10B981',
-  },
 
   shadowLow: {
     shadowColor: '#000000',

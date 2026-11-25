@@ -28,6 +28,8 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "jest",
+    "test:arch": "jest test/architecture",
+    "check:solid": "npm run lint && npm run typecheck && npm run test:arch",
     "guard:edits": "node .agents/hooks/guard-edits.mjs",
     "lint:edit": "node .agents/hooks/lint-on-edit.mjs"
   },

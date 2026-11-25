@@ -20,6 +20,7 @@ export type {
 export type { ScreenLoadState } from './screen-load-state';
 export type {
   VictoryAction,
-  VictoryResultVariant,
+  VictoryMetricDTO,
+  VictoryResultSummary,
   VictoryViewDTO,
 } from './victory.dto';
