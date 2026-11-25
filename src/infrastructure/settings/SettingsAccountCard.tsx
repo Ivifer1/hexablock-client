@@ -6,9 +6,10 @@ import {
   RADIUS,
   SPACING,
   TYPOGRAPHY,
-  scaleButtonSize,
+  withAlpha,
   type Theme,
 } from '../theme';
+import { AppButton } from '../ui';
 import { SessionActionIcon } from '../ui-icons/MenuIcons';
 import { LogoutIcon } from '../ui-icons/SettingsIcons';
 
@@ -24,11 +25,6 @@ export interface SettingsAccountCardProps {
   readonly onPressLogout: () => void;
 }
 
-function withAlpha(hex: string, alphaHex: string): string {
-  if (/^#[0-9A-Fa-f]{6}$/.test(hex)) return `${hex}${alphaHex}`;
-  return hex;
-}
-
 export function SettingsAccountCard({
   eyebrowLabel,
   session,
@@ -41,18 +37,16 @@ export function SettingsAccountCard({
   onPressLogout,
 }: SettingsAccountCardProps) {
   const styles = useMemo(() => createStyles(theme, isDark), [theme, isDark]);
-  const signInButton = scaleButtonSize('m');
-  const initial = (session.displayName?.trim().charAt(0) || '?').toUpperCase();
 
   return (
-    <View style={styles.card}>
+    <View testID="settings-account-card" style={styles.card}>
       <Text style={styles.eyebrow}>{eyebrowLabel}</Text>
 
       {session.isAuthenticated ? (
         <View style={styles.authenticatedContent}>
           <View style={styles.profileRow}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarLetter}>{initial}</Text>
+            <View testID="settings-account-avatar-icon" style={styles.avatar}>
+              <SessionActionIcon hasSession color={theme.primary} size={20} />
               <View style={styles.activeDot} />
             </View>
             <View style={styles.profileInfo}>
@@ -82,39 +76,20 @@ export function SettingsAccountCard({
           </Pressable>
         </View>
       ) : (
-        <Pressable
+        <AppButton
           testID="settings-signin-button"
-          accessibilityRole="button"
-          accessibilityLabel={signInLabel}
+          label={signInLabel}
           onPress={onPressSignIn}
-          style={({ pressed }) => [
-            styles.signInButton,
-            {
-              minHeight: signInButton.minHeight,
-              paddingHorizontal: signInButton.paddingHorizontal,
-              paddingVertical: signInButton.paddingVertical,
-              gap: signInButton.gap,
-            },
-            pressed && styles.buttonPressed,
-          ]}
-        >
-          <SessionActionIcon
-            hasSession={false}
-            color={theme.primaryFg}
-            size={signInButton.iconSize}
-          />
-          <Text
-            style={[
-              styles.signInLabel,
-              {
-                fontSize: signInButton.fontSize,
-                lineHeight: signInButton.lineHeight,
-              },
-            ]}
-          >
-            {signInLabel}
-          </Text>
-        </Pressable>
+          theme={theme}
+          isDark={isDark}
+          variant="primary"
+          size="m"
+          shape="pill"
+          fullWidth
+          leftIcon={({ color, size }) => (
+            <SessionActionIcon hasSession={false} color={color} size={size} />
+          )}
+        />
       )}
     </View>
   );
@@ -148,26 +123,22 @@ function createStyles(theme: Theme, isDark: boolean) {
       gap: SPACING.s3,
     },
     avatar: {
-      width: 48,
-      height: 48,
+      width: 40,
+      height: 40,
       borderRadius: RADIUS.full,
-      backgroundColor: theme.primary,
+      backgroundColor: withAlpha(theme.primary, isDark ? '24' : '14'),
+      borderWidth: BORDER_WIDTH.thin,
+      borderColor: withAlpha(theme.primary, '35'),
       alignItems: 'center',
       justifyContent: 'center',
       flexShrink: 0,
-      ...theme.shadowLow,
-    },
-    avatarLetter: {
-      fontSize: 18,
-      fontWeight: '800',
-      color: theme.primaryFg,
     },
     activeDot: {
       position: 'absolute',
       bottom: -1,
       right: -1,
-      width: 12,
-      height: 12,
+      width: 11,
+      height: 11,
       borderRadius: RADIUS.full,
       backgroundColor: theme.success,
       borderWidth: BORDER_WIDTH.thick,
@@ -207,21 +178,6 @@ function createStyles(theme: Theme, isDark: boolean) {
       lineHeight: TYPOGRAPHY.bodyMedium.lineHeight,
       fontWeight: '700',
       color: theme.danger,
-    },
-    signInButton: {
-      alignSelf: 'flex-start',
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      borderRadius: RADIUS.full,
-      borderWidth: BORDER_WIDTH.thick,
-      backgroundColor: theme.primary,
-      borderColor: isDark ? theme.primaryHover : withAlpha(theme.primaryHover, '55'),
-      ...theme.shadowGlowPrimary,
-    },
-    signInLabel: {
-      fontWeight: '700',
-      color: theme.primaryFg,
     },
     buttonPressed: {
       opacity: 0.9,

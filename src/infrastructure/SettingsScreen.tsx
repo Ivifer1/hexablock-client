@@ -2,14 +2,12 @@ import { useEffect, useMemo } from 'react';
 import {
   BackHandler,
   Platform,
-  SafeAreaView,
-  ScrollView,
   StatusBar as RNStatusBar,
   StyleSheet,
+  Text,
   View,
   useWindowDimensions,
 } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
 import type {
   ISettingsAccountController,
   ISettingsNavigationPort,
@@ -28,7 +26,8 @@ import { SettingsErrorBanner } from './settings/SettingsErrorBanner';
 import { SettingsHeader } from './settings/SettingsHeader';
 import { SettingsLanguageCard } from './settings/SettingsLanguageCard';
 import { SettingsLogoutDialog } from './settings/SettingsLogoutDialog';
-import { RADIUS, SPACING, useTheme, type Theme } from './theme';
+import { SPACING, TYPOGRAPHY, useTheme, type Theme } from './theme';
+import { MenuScreenShell } from './ui';
 
 export interface SettingsScreenProps {
   readonly view: SettingsViewDTO;
@@ -41,11 +40,6 @@ export interface SettingsScreenProps {
   readonly isPointsAvailable?: boolean;
   readonly onPressPoints?: () => void;
   readonly onPressPlay?: () => void;
-}
-
-function withAlpha(hex: string, alphaHex: string): string {
-  if (/^#[0-9A-Fa-f]{6}$/.test(hex)) return `${hex}${alphaHex}`;
-  return hex;
 }
 
 export function SettingsScreen({
@@ -91,56 +85,70 @@ export function SettingsScreen({
   );
 
   return (
-    <SafeAreaView style={styles.page}>
-      <StatusBar style={isDark ? 'light' : 'dark'} />
-      <View style={styles.atmosphere} pointerEvents="none">
-        <View
-          style={[
-            styles.atmosphereBlob,
-            styles.atmosphereBlobTop,
-            { backgroundColor: withAlpha(theme.primary, isDark ? '22' : '14') },
-          ]}
+    <MenuScreenShell
+      theme={theme}
+      isDark={isDark}
+      horizontalPadding={layout.horizontalPadding}
+      topSafeInset={layout.topSafeInset}
+      scrollable
+      bodyPaddingBottom={view.showBottomMenu ? SPACING.s6 : layout.bottomSafeInset + SPACING.s4}
+      header={
+        <SettingsHeader
+          title={textCatalog.resolve(view.title, activeLocale)}
+          backLabel={textCatalog.resolve(view.backLabel, activeLocale)}
+          theme={theme}
+          onBack={() => navigation.goBack()}
         />
-        <View
-          style={[
-            styles.atmosphereBlob,
-            styles.atmosphereBlobBottom,
-            { backgroundColor: withAlpha(theme.primary, isDark ? '14' : '0A') },
-          ]}
+      }
+      bottomMenu={
+        view.showBottomMenu ? (
+          <HomeBottomMenu
+            selectedMenu="SETTINGS"
+            isPointsAvailable={isPointsAvailable}
+            menuHeight={layout.menuHeight}
+            bottomSafeInset={layout.bottomSafeInset}
+            menuIconSize={layout.menuIconSize}
+            theme={theme}
+            textCatalog={textCatalog}
+            locale={activeLocale}
+            onPressPoints={() => onPressPoints?.()}
+            onPressPlay={() => (onPressPlay ? onPressPlay() : navigation.goBack())}
+            onPressSettings={() => undefined}
+          />
+        ) : null
+      }
+      overlay={
+        <SettingsLogoutDialog
+          visible={view.isLogoutConfirmOpen}
+          message={textCatalog.resolve('settings.logout_confirm', activeLocale)}
+          cancelLabel={textCatalog.resolve('common.cancel', activeLocale)}
+          confirmLabel={textCatalog.resolve('common.confirm', activeLocale)}
+          theme={theme}
+          onCancel={() => accountController.cancelLogout()}
+          onConfirm={() => accountController.confirmLogout()}
         />
-      </View>
-
-      <View style={styles.content}>
-        <ScrollView
-          style={styles.scroll}
-          contentContainerStyle={[
-            styles.scrollContent,
-            {
-              paddingHorizontal: layout.horizontalPadding,
-              paddingTop: layout.topSafeInset,
-              paddingBottom: SPACING.s6,
-            },
-          ]}
-          showsVerticalScrollIndicator={false}
-        >
-          <View style={styles.innerColumn}>
-            <SettingsHeader
-              title={textCatalog.resolve(view.title, activeLocale)}
-              backLabel={textCatalog.resolve(view.backLabel, activeLocale)}
-              versionLabel={
-                view.versionLabel
-                  ? textCatalog.resolve(view.versionLabel, activeLocale)
-                  : null
-              }
-              theme={theme}
-              onBack={() => navigation.goBack()}
-            />
+      }
+    >
 
             {view.errorMessage ? (
               <SettingsErrorBanner
                 message={textCatalog.resolve(view.errorMessage, activeLocale)}
                 theme={theme}
                 isDark={isDark}
+              />
+            ) : null}
+
+            {view.session.isEnabled ? (
+              <SettingsAccountCard
+                eyebrowLabel={textCatalog.resolve('settings.account', activeLocale)}
+                session={view.session}
+                authenticatedTitle={authenticatedTitle}
+                signInLabel={textCatalog.resolve('common.sign_in', activeLocale)}
+                logoutLabel={textCatalog.resolve('settings.logout', activeLocale)}
+                theme={theme}
+                isDark={isDark}
+                onPressSignIn={() => accountController.openLogin()}
+                onPressLogout={() => accountController.requestLogout()}
               />
             ) : null}
 
@@ -172,93 +180,29 @@ export function SettingsScreen({
               onSelectLocale={(code) => preferencesController.selectLocale(code)}
             />
 
-            {view.session.isEnabled ? (
-              <SettingsAccountCard
-                eyebrowLabel={textCatalog.resolve('settings.account', activeLocale)}
-                session={view.session}
-                authenticatedTitle={authenticatedTitle}
-                signInLabel={textCatalog.resolve('common.sign_in', activeLocale)}
-                logoutLabel={textCatalog.resolve('settings.logout', activeLocale)}
-                theme={theme}
-                isDark={isDark}
-                onPressSignIn={() => accountController.openLogin()}
-                onPressLogout={() => accountController.requestLogout()}
-              />
-            ) : null}
-          </View>
-        </ScrollView>
-
-        {view.showBottomMenu ? (
-          <HomeBottomMenu
-            selectedMenu="SETTINGS"
-            isPointsAvailable={isPointsAvailable}
-            menuHeight={layout.menuHeight}
-            bottomSafeInset={layout.bottomSafeInset}
-            menuIconSize={layout.menuIconSize}
-            theme={theme}
-            textCatalog={textCatalog}
-            locale={activeLocale}
-            onPressPoints={() => onPressPoints?.()}
-            onPressPlay={() => (onPressPlay ? onPressPlay() : navigation.goBack())}
-            onPressSettings={() => undefined}
-          />
-        ) : null}
-      </View>
-
-      <SettingsLogoutDialog
-        visible={view.isLogoutConfirmOpen}
-        message={textCatalog.resolve('settings.logout_confirm', activeLocale)}
-        cancelLabel={textCatalog.resolve('common.cancel', activeLocale)}
-        confirmLabel={textCatalog.resolve('common.confirm', activeLocale)}
-        theme={theme}
-        onCancel={() => accountController.cancelLogout()}
-        onConfirm={() => accountController.confirmLogout()}
-      />
-    </SafeAreaView>
+      {view.versionLabel ? (
+        <View testID="settings-version-footer" style={styles.versionFooter}>
+          <Text style={styles.versionFooterText}>
+            {textCatalog.resolve(view.versionLabel, activeLocale)}
+          </Text>
+        </View>
+      ) : null}
+    </MenuScreenShell>
   );
 }
 
 function createStyles(theme: Theme) {
   return StyleSheet.create({
-    page: {
-      flex: 1,
-      backgroundColor: theme.bg,
+    versionFooter: {
+      alignItems: 'center',
+      paddingTop: SPACING.s2,
+      paddingBottom: SPACING.s1,
     },
-    atmosphere: {
-      ...StyleSheet.absoluteFill,
-      overflow: 'hidden',
-    },
-    atmosphereBlob: {
-      position: 'absolute',
-      borderRadius: RADIUS.full,
-    },
-    atmosphereBlobTop: {
-      width: 280,
-      height: 280,
-      top: -80,
-      right: -60,
-    },
-    atmosphereBlobBottom: {
-      width: 240,
-      height: 240,
-      bottom: 80,
-      left: -80,
-    },
-    content: {
-      flex: 1,
-      width: '100%',
-    },
-    scroll: {
-      flex: 1,
-    },
-    scrollContent: {
-      flexGrow: 1,
-    },
-    innerColumn: {
-      width: '100%',
-      maxWidth: 480,
-      alignSelf: 'center',
-      gap: SPACING.s4,
+    versionFooterText: {
+      fontSize: TYPOGRAPHY.caption.fontSize,
+      lineHeight: TYPOGRAPHY.caption.lineHeight,
+      fontWeight: '600',
+      color: theme.textSecondary,
     },
   });
 }

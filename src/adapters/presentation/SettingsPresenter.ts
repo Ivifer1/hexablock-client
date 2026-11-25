@@ -55,7 +55,7 @@ export class SettingsPresenter implements ISettingsPresenter {
       isLogoutConfirmOpen: snapshot.isLogoutConfirmOpen,
       errorMessage: snapshot.errorKey ? { key: snapshot.errorKey } : null,
       versionLabel: this.appVersion
-        ? { key: 'settings.version_badge', parameters: { version: this.appVersion } }
+        ? { key: 'settings.version', parameters: { version: this.appVersion } }
         : null,
       showBottomMenu: snapshot.origin === 'HOME',
     };

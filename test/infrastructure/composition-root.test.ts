@@ -135,7 +135,7 @@ describe('CompositionRoot', () => {
     expect(root.localeController.getLocale()).toBe('fr');
     expect(root.themeController.getMode()).toBe('dark');
     expect(root.settingsOutput.current?.versionLabel).toEqual({
-      key: 'settings.version_badge',
+      key: 'settings.version',
       parameters: { version: '2.0.0' },
     });
     expect(root.settingsOutput.current?.locales).toHaveLength(3);

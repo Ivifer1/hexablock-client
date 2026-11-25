@@ -1,15 +1,15 @@
 import { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { SvgXml } from 'react-native-svg';
-import { RADIUS, type Theme } from '../theme';
-import { withAlpha } from './shared';
+import { RADIUS, withAlpha, type Theme } from '../theme';
 
-export interface HomeAtmosphereProps {
+export interface MenuBackgroundProps {
   readonly theme: Theme;
   readonly isDark: boolean;
+  readonly testID?: string;
 }
 
-function buildHexPatternSvg(color: string, isDark: boolean): string {
+export function buildMenuHexPatternSvg(color: string, isDark: boolean): string {
   const fillOpacity = isDark ? '0.06' : '0.05';
   const strokeOpacity = isDark ? '0.1' : '0.08';
 
@@ -23,14 +23,22 @@ function buildHexPatternSvg(color: string, isDark: boolean): string {
   </svg>`;
 }
 
-export function HomeAtmosphere({ theme, isDark }: HomeAtmosphereProps) {
+/**
+ * Standardized decorative background shared across primary menu screens
+ * (radial atmosphere blobs plus subtle hexagonal vector overlay).
+ */
+export function MenuBackground({
+  theme,
+  isDark,
+  testID = 'menu-background',
+}: MenuBackgroundProps) {
   const patternSvg = useMemo(
-    () => buildHexPatternSvg(theme.primary, isDark),
+    () => buildMenuHexPatternSvg(theme.primary, isDark),
     [theme.primary, isDark],
   );
 
   return (
-    <View style={styles.atmosphere} pointerEvents="none">
+    <View testID={testID} style={styles.atmosphere} pointerEvents="none">
       <View
         style={[
           styles.atmosphereBlob,
@@ -45,7 +53,7 @@ export function HomeAtmosphere({ theme, isDark }: HomeAtmosphereProps) {
           { backgroundColor: withAlpha(theme.primary, isDark ? '10' : '0A') },
         ]}
       />
-      <View style={styles.hexOverlay}>
+      <View testID={`${testID}-hex-pattern`} style={styles.hexOverlay}>
         <SvgXml xml={patternSvg} width="100%" height="100%" preserveAspectRatio="xMidYMid slice" />
       </View>
     </View>

@@ -1,6 +1,6 @@
 import { createElement } from 'react';
 import { BackHandler, View as mockRNView } from 'react-native';
-import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
+import { act, fireEvent, render, waitFor, within } from '@testing-library/react-native';
 import { StaticLocaleCatalog, StaticTextCatalog } from '../../src/adapters/i18n';
 import {
   InMemoryHomeSessionReader,
@@ -101,17 +101,29 @@ describe('SettingsScreen UI (02 · Ajustes & UC-007)', () => {
     return { ...rendered, root, navCalls, rerenderLatest };
   }
 
-  it('should_render_header_with_version_badge_audio_theme_language_and_bottom_menu_from_home', async () => {
+  it('should_render_header_account_first_audio_theme_language_version_footer_and_bottom_menu_from_home', async () => {
     // Arrange & Act
-    const { getAllByText, getByText, getByTestId, queryByText } = await renderSettings({
-      origin: 'HOME',
-      appVersion: '1.0.0',
-    });
+    const { getAllByText, getByText, getByTestId, queryByTestId, queryByText, toJSON } =
+      await renderSettings({
+        origin: 'HOME',
+        appVersion: '1.0.0',
+      });
+    const serializedTree = JSON.stringify(toJSON());
 
     // Assert
+    expect(getByTestId('menu-background')).toBeTruthy();
+    expect(getByTestId('menu-background-hex-pattern')).toBeTruthy();
     expect(getAllByText('Ajustes')).toHaveLength(2);
-    expect(getByTestId('settings-version-badge')).toBeTruthy();
-    expect(getByText('v1.0.0')).toBeTruthy();
+    expect(getByTestId('settings-account-card')).toBeTruthy();
+    expect(serializedTree.indexOf('settings-account-card')).toBeLessThan(
+      serializedTree.indexOf('Música'),
+    );
+    expect(queryByTestId('settings-version-badge')).toBeNull();
+    expect(getByTestId('settings-version-footer')).toBeTruthy();
+    expect(getByText('Versión 1.0.0')).toBeTruthy();
+    expect(serializedTree.indexOf('settings-version-footer')).toBeGreaterThan(
+      serializedTree.indexOf('Idioma'),
+    );
     expect(getByText('Música')).toBeTruthy();
     expect(getByText('Efectos de sonido')).toBeTruthy();
     expect(getByText('Modo oscuro')).toBeTruthy();
@@ -223,6 +235,7 @@ describe('SettingsScreen UI (02 · Ajustes & UC-007)', () => {
       expect(getByText('Language')).toBeTruthy();
       expect(getByText('Account')).toBeTruthy();
       expect(getByText('Sign in')).toBeTruthy();
+      expect(getByText('Version 1.0.0')).toBeTruthy();
     });
   });
 
@@ -247,6 +260,7 @@ describe('SettingsScreen UI (02 · Ajustes & UC-007)', () => {
     // Assert visual parity & Act
     expect(getByText('Iniciar sesión')).toBeTruthy();
     expect(btnStyle.backgroundColor).toBe(LIGHT_THEME.primary);
+    expect(btnStyle.width).toBe('100%');
     expect(Number(btnStyle.minHeight)).toBeGreaterThanOrEqual(BUTTON_SIZES.m.minHeight);
 
     await fireEvent.press(signInBtn);
@@ -255,10 +269,13 @@ describe('SettingsScreen UI (02 · Ajustes & UC-007)', () => {
 
   it('should_confirm_before_signing_out_when_authenticated', async () => {
     // Arrange
-    const { getByTestId, getByText, queryByTestId, rerenderLatest } = await renderSettings({
-      isAuthenticated: true,
-      displayName: 'Leo',
-    });
+    const { getByTestId, getByText, queryByTestId, queryByText, rerenderLatest } =
+      await renderSettings({
+        isAuthenticated: true,
+        displayName: 'Leo',
+      });
+    expect(getByTestId('settings-account-avatar-icon')).toBeTruthy();
+    expect(queryByText('L')).toBeNull();
     expect(getByText('Hola, Leo')).toBeTruthy();
 
     // Act: open dialog then cancel
@@ -322,5 +339,49 @@ describe('SettingsScreen UI (02 · Ajustes & UC-007)', () => {
     // Assert
     expect(handled).toBe(true);
     expect(navCalls).toEqual(['BACK', 'BACK']);
+  });
+
+  it('should_keep_fixed_header_margins_aligned_with_home_and_scroll_only_body_downward', async () => {
+    // Arrange
+    const settings = await renderSettings({ origin: 'HOME', appVersion: '1.0.0' });
+    const root = settings.root;
+    root.initializeHome();
+    const home = await render(
+      <HomeScreen
+        view={root.homeOutput.current!}
+        controller={root.homeController}
+        textCatalog={root.textCatalog}
+        themeController={root.themeController}
+        locale={root.localeController.getLocale()}
+        modeIconResolver={root.modeIconResolver}
+        previewResolver={root.previewAssetResolver}
+      />,
+    );
+
+    const flattenStyle = (style: unknown): Record<string, unknown> => {
+      if (!style) return {};
+      if (Array.isArray(style)) {
+        return style.reduce<Record<string, unknown>>(
+          (acc, entry) => ({ ...acc, ...flattenStyle(entry) }),
+          {},
+        );
+      }
+      return typeof style === 'object' ? (style as Record<string, unknown>) : {};
+    };
+
+    const headerSlot = settings.getByTestId('menu-screen-header-slot');
+    const settingsHeaderStyle = flattenStyle(headerSlot.props.style);
+    const homeHeaderStyle = flattenStyle(home.getByTestId('menu-screen-header-slot').props.style);
+    const scrollView = settings.getByTestId('menu-screen-scroll');
+
+    // Assert
+    expect(settingsHeaderStyle.paddingTop).toBe(homeHeaderStyle.paddingTop);
+    expect(settingsHeaderStyle.paddingHorizontal).toBe(homeHeaderStyle.paddingHorizontal);
+    expect(within(headerSlot).getByTestId('settings-back-button')).toBeTruthy();
+    expect(within(scrollView).queryByTestId('settings-back-button')).toBeNull();
+    expect(within(scrollView).getByTestId('settings-account-card')).toBeTruthy();
+    expect(within(scrollView).getByTestId('settings-version-footer')).toBeTruthy();
+    expect(scrollView.props.contentInsetAdjustmentBehavior).toBe('never');
+    expect(scrollView.props.automaticallyAdjustContentInsets).toBe(false);
   });
 });

@@ -92,10 +92,13 @@ describe('HomeScreen UI (UC-005 & UC-006)', () => {
 
   it('should_render_all_registered_modes_when_home_loads', async () => {
     // Arrange & Act
-    const { getByLabelText, getByText } = await renderHome();
+    const { getByLabelText, getByTestId, getByText } = await renderHome();
 
     // Assert
     await waitFor(() => {
+      expect(getByTestId('menu-background')).toBeTruthy();
+      expect(getByTestId('menu-background-hex-pattern')).toBeTruthy();
+      expect(getByTestId('menu-screen-header-slot')).toBeTruthy();
       expect(getByText('HexaBlock Suite')).toBeTruthy();
       expect(getByLabelText('Hexa Lines')).toBeTruthy();
       expect(getByLabelText('Hexa Merge')).toBeTruthy();

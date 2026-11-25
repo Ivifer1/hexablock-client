@@ -16,3 +16,7 @@ export type {
   AppButtonVariantStrategy,
   AppButtonVariantStyle,
 } from './buttonVariants';
+export { MenuBackground, buildMenuHexPatternSvg } from './MenuBackground';
+export type { MenuBackgroundProps } from './MenuBackground';
+export { MenuScreenShell } from './MenuScreenShell';
+export type { MenuScreenShellProps } from './MenuScreenShell';

@@ -16,7 +16,7 @@
 - The Player enters Ajustes and interacts with an audio, theme, language, account, or back control.
 
 ## Main success scenario
-1. System displays the Ajustes header with a back button, the title, and the release version badge to the right of the title.
+1. System displays the Ajustes header with a back button and the title.
 2. System displays current persisted values for music, sound effects, dark mode, available languages, and account session state.
 3. Player toggles music, sound effects, or dark mode, or selects an available language.
 4. System persists the preference and applies the change immediately without restarting the app.
@@ -46,5 +46,5 @@
 - BR-007-6: Changing language updates all visible texts across screens immediately without restarting.
 - BR-007-7: When preference persistence fails, the control rolls back to its previous persisted value and displays `settings.error_save`.
 - BR-007-8: When unauthenticated, the Account card offers the Sign in CTA styled consistently with Inicio; when authenticated, Sign out requires explicit confirmation.
-- BR-007-9: The release version badge appears directly to the right of the Ajustes title when configured.
+- BR-007-9: The release version appears as a footer at the bottom of Ajustes when configured.
 - BR-007-10: The bottom menu is visible only when Ajustes is opened from Inicio (`HOME`) and hidden when opened from Pausa (`PAUSE`).

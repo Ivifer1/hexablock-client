@@ -6,7 +6,6 @@ import { BackArrowIcon } from '../ui-icons/SettingsIcons';
 export interface SettingsHeaderProps {
   readonly title: string;
   readonly backLabel: string;
-  readonly versionLabel: string | null;
   readonly theme: Theme;
   readonly onBack: () => void;
 }
@@ -14,7 +13,6 @@ export interface SettingsHeaderProps {
 export function SettingsHeader({
   title,
   backLabel,
-  versionLabel,
   theme,
   onBack,
 }: SettingsHeaderProps) {
@@ -41,12 +39,6 @@ export function SettingsHeader({
         >
           {title}
         </Text>
-
-        {versionLabel ? (
-          <View testID="settings-version-badge" style={styles.versionBadge}>
-            <Text style={styles.versionText}>{versionLabel}</Text>
-          </View>
-        ) : null}
       </View>
     </View>
   );
@@ -56,6 +48,8 @@ function createStyles(theme: Theme) {
   return StyleSheet.create({
     header: {
       width: '100%',
+      maxWidth: 480,
+      alignSelf: 'center',
       minHeight: SPACING.touchTargetMin,
       flexDirection: 'row',
       alignItems: 'center',
@@ -90,20 +84,6 @@ function createStyles(theme: Theme) {
       color: theme.textPrimary,
       letterSpacing: -0.3,
       flexShrink: 1,
-    },
-    versionBadge: {
-      paddingHorizontal: SPACING.s2 + 2,
-      paddingVertical: 4,
-      borderRadius: RADIUS.full,
-      backgroundColor: theme.surfaceSubdued,
-      borderWidth: BORDER_WIDTH.thin,
-      borderColor: theme.borderDefault,
-    },
-    versionText: {
-      fontSize: TYPOGRAPHY.caption.fontSize,
-      lineHeight: TYPOGRAPHY.caption.lineHeight,
-      fontWeight: '600',
-      color: theme.textSecondary,
     },
   });
 }

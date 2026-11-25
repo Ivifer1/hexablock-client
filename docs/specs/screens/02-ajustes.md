@@ -21,7 +21,7 @@ Permite silenciar música y efectos, cambiar de idioma y, si hay cuentas, gestio
 | AJU-03b | Interruptor de modo oscuro | Interruptor | Confirmado | `settings.appearance`, `settings.dark_mode` | Cambia el tema claro/oscuro de la aplicación al instante sin reiniciar |
 | AJU-04 | Selector de idioma | Lista de opciones excluyentes | Sí (SUI-04) | `settings.language`, `lang.es`, `lang.en` | Cada idioma aparece con su propio nombre, sin traducir, y un icono vectorial plano (sin banderas ni emojis). El cambio se aplica al instante |
 | AJU-05 | Sección de cuenta | Bloque | Confirmado (P-18) | `settings.account`, `common.sign_in`, `settings.logout` | Sin sesión: botón primario de Iniciar sesión coherente con Inicio para ir a Login. Con sesión: nombre de usuario y botón de cerrar sesión |
-| AJU-06 | Versión de la app | Insignia junto al título `Ajustes` | Opcional | `settings.version_badge` | Solo informativo (`v{version}`) a la derecha del título del encabezado |
+| AJU-06 | Versión de la app | Pie de pantalla | Opcional | `settings.version` | Solo informativo (`Versión {version}`) al pie de la pantalla de Ajustes |
 
 **No incluir hasta decidir (P-17):** borrar progreso, créditos, y controles de volumen. Si se añade "Borrar progreso", necesita un diálogo de confirmación.
 

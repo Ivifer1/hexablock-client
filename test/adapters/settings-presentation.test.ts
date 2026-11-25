@@ -257,7 +257,7 @@ describe('Settings presentation & adapter contracts (UC-007)', () => {
     expect(authed.sessionReader.getSnapshot().isAuthenticated).toBe(false);
   });
 
-  it('should_show_bottom_menu_only_for_home_origin_and_expose_version_badge', () => {
+  it('should_show_bottom_menu_only_for_home_origin_and_expose_version_footer', () => {
     // Arrange & Act
     const fromHome = createHarness({ origin: 'HOME', appVersion: '1.2.3' });
     const fromPause = createHarness({ origin: 'PAUSE', appVersion: '1.2.3' });
@@ -265,7 +265,7 @@ describe('Settings presentation & adapter contracts (UC-007)', () => {
     // Assert
     expect(fromHome.output.current?.showBottomMenu).toBe(true);
     expect(fromHome.output.current?.versionLabel).toEqual({
-      key: 'settings.version_badge',
+      key: 'settings.version',
       parameters: { version: '1.2.3' },
     });
     expect(fromPause.output.current?.showBottomMenu).toBe(false);
