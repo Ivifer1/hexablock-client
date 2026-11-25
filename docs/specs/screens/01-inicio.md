@@ -8,7 +8,7 @@
 
 | Campo | Valor |
 | --- | --- |
-| Estado | Lista para diseñar |
+| Estado | Implementada (pendiente navegación/integración) |
 | Requerimientos | SUI-01, SUI-02, SUI-08, PRG-02, FR-029. Indicador de sesión y ranking: INT-01 e INT-02 |
 | Se llega desde | Apertura de la app, "volver al menú" desde cualquier pantalla, login o registro exitosos |
 | Lleva a | Partida (Lines, Merge), Selección de niveles (Fit, Sort), Ajustes, Login |
@@ -22,7 +22,7 @@ Es la primera pantalla. Presenta la suite y deja elegir una de las variantes. Ta
 | ID | Elemento | Tipo | Obligatorio | Texto | Comportamiento |
 | --- | --- | --- | --- | --- | --- |
 | INI-01 | Nombre de la suite | Texto o logotipo | Sí (SUI-01) | `app.title` | Siempre visible |
-| INI-02 | Acceso a ajustes | Botón con icono | Sí (SUI-01) | `home.settings` (etiqueta de accesibilidad) | Abre Ajustes. Siempre en la misma posición |
+| INI-02 | Alternar tema / acceso rápido en cabecera | Botón con icono | Sí (SUI-01) | `home.theme_toggle_light`, `home.theme_toggle_dark` | Alterna modo claro/oscuro en cabecera; el acceso a Ajustes se centraliza en `INI-08c` dentro de la navegación inferior |
 | INI-03 | Selector de juego | Rueda hexagonal rotatoria | Sí (SUI-01) | — | Rueda con estética hexagonal inspirada en dial mecánico/óptico. El modo seleccionado se ubica arriba (12:00), más grande y destacado. Girar la rueda o tocar un icono anima la rueda hasta ubicar el modo activo arriba. |
 | INI-03a | Vista previa central | Panel visual dinámico | Sí | — | Carga una vista previa del modo seleccionado en el centro de la rueda. |
 | INI-04 | Detalle del juego seleccionado | Panel/ficha con acción principal | Sí | `game.<id>.name`, `game.<id>.desc` | Muestra el nombre del modo seleccionado, etiqueta de tipo (`partida_directa` o `por_niveles`), descripción corta, chip de progreso (INI-05) y botón principal para jugar. |

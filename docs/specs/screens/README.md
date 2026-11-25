@@ -8,7 +8,7 @@ Estos archivos describen qué debe tener cada pantalla que se puede adelantar an
 
 | # | Archivo | Pantalla | Estado | Requerimientos |
 | --- | --- | --- | --- | --- |
-| 01 | [`Inicio`](./01-inicio.md) | Inicio y selector de juego | Lista para diseñar | SUI-01, SUI-02, SUI-08, PRG-02 |
+| 01 | [`Inicio`](./01-inicio.md) | Inicio y selector de juego | Implementada (pendiente navegación/integración) | SUI-01, SUI-02, SUI-08, PRG-02 |
 | 02 | [`Ajustes`](./02-ajustes.md) | Ajustes | Lista para diseñar (P-17) | SUI-03, SUI-04, SUI-05 |
 | 03 | [`Login`](./03-login.md) | Inicio de sesión | Condicionada a P-18 y P-20 | INT-01, INT-02, INT-07, BCK-02 |
 | 04 | [`Registro`](./04-registro.md) | Registro | Condicionada a P-18 y P-20 | INT-01, BCK-01 |
