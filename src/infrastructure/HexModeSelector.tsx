@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { Animated, Platform, StyleSheet, View } from 'react-native';
+import type { ReactNode } from 'react';
+import { StyleSheet, View } from 'react-native';
 import type { IAssetResolver } from '../application/ports';
 import type { IHomePreview } from './home-previews';
 import { HexShowcaseFrame } from './home/HexShowcaseFrame';
@@ -10,8 +10,6 @@ import type { ModeIconComponent } from './mode-icons';
 import type { Theme } from './theme';
 
 export type { ExtendedHomeModeDTO };
-
-const USE_NATIVE_DRIVER = Platform.OS !== 'web';
 
 export interface HexModeSelectorProps {
   readonly modes: readonly ExtendedHomeModeDTO[];
@@ -46,36 +44,6 @@ export function HexModeSelector({
   nextModeLabel,
   middleContent,
 }: HexModeSelectorProps) {
-  const [corePulse] = useState(() => new Animated.Value(1));
-  const isInitialMountRef = useRef(true);
-  const prevSelectedIdRef = useRef<string | null>(selectedId);
-
-  useEffect(() => {
-    if (isInitialMountRef.current) {
-      isInitialMountRef.current = false;
-      prevSelectedIdRef.current = selectedId;
-      return;
-    }
-
-    const selectionChanged = prevSelectedIdRef.current !== selectedId;
-    prevSelectedIdRef.current = selectedId;
-
-    if (!selectionChanged) return;
-    if (reduceMotion) {
-      corePulse.setValue(1);
-      return;
-    }
-
-    corePulse.setValue(0.92);
-    Animated.spring(corePulse, {
-      toValue: 1,
-      stiffness: 220,
-      damping: 16,
-      mass: 0.8,
-      useNativeDriver: USE_NATIVE_DRIVER,
-    }).start();
-  }, [selectedId, reduceMotion, corePulse]);
-
   const selectedIndex = Math.max(
     0,
     modes.findIndex((mode) => mode.id === selectedId),
@@ -102,7 +70,7 @@ export function HexModeSelector({
           arrowButtonSize={layout.arrowButtonSize}
           arrowGap={layout.arrowGap}
           activePreview={activePreview}
-          corePulse={corePulse}
+          pulseKey={selectedId ?? ''}
           reduceMotion={reduceMotion}
           totalModes={modes.length}
           prevModeLabel={prevModeLabel}

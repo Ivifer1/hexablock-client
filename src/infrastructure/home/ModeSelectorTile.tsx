@@ -1,11 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Animated, Platform, Pressable, StyleSheet, Text } from 'react-native';
+import { useMemo } from 'react';
+import { Pressable, StyleSheet, Text } from 'react-native';
 import type { IAssetResolver } from '../../application/ports';
 import type { ModeIconComponent } from '../mode-icons';
+import { AnimatedScale, MOTION_SPRINGS } from '../motion';
 import { BORDER_WIDTH, RADIUS, SPACING, TYPOGRAPHY, type Theme } from '../theme';
 import { renderModeIcon, withAlpha, type ExtendedHomeModeDTO } from './shared';
-
-const USE_NATIVE_DRIVER = Platform.OS !== 'web';
 
 export interface ModeSelectorTileProps {
   readonly mode: ExtendedHomeModeDTO;
@@ -37,28 +36,16 @@ export function ModeSelectorTile({
   onSelectMode,
 }: ModeSelectorTileProps) {
   const styles = useMemo(() => createStyles(theme), [theme]);
-  const [scaleAnim] = useState(() => new Animated.Value(isSelected ? 1.04 : 1));
-
-  useEffect(() => {
-    const targetScale = isSelected ? 1.04 : 1;
-    if (reduceMotion) {
-      scaleAnim.setValue(targetScale);
-      return;
-    }
-    Animated.spring(scaleAnim, {
-      toValue: targetScale,
-      stiffness: 220,
-      damping: 18,
-      mass: 0.85,
-      useNativeDriver: USE_NATIVE_DRIVER,
-    }).start();
-  }, [isSelected, reduceMotion, scaleAnim]);
-
   const activeBg = isDark ? withAlpha(theme.primary, '1C') : withAlpha(theme.primary, '12');
   const activeBorder = isDark ? theme.primaryHover : theme.primary;
 
   return (
-    <Animated.View style={[styles.tileWrapper, { transform: [{ scale: scaleAnim }] }]}>
+    <AnimatedScale
+      scale={isSelected ? 1.04 : 1}
+      spring={MOTION_SPRINGS.tileSelection}
+      reduceMotion={reduceMotion}
+      style={styles.tileWrapper}
+    >
       <Pressable
         testID={`mode-tile-${mode.id}`}
         accessibilityRole="button"
@@ -102,7 +89,7 @@ export function ModeSelectorTile({
           {shortLabel}
         </Text>
       </Pressable>
-    </Animated.View>
+    </AnimatedScale>
   );
 }
 

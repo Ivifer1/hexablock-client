@@ -1,7 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
-  AccessibilityInfo,
-  Animated,
   Platform,
   SafeAreaView,
   StatusBar as RNStatusBar,
@@ -28,8 +26,8 @@ import { HomeModeCard } from './home/HomeModeCard';
 import type { HomeProgressFormatterMap } from './home/progressFormatters';
 import { computeHomeLayoutMetrics } from './homeLayout';
 import type { ModeIconComponent } from './mode-icons';
+import { useReducedMotion } from './motion';
 import {
-  MOTION,
   SPACING,
   TYPOGRAPHY,
   useTheme,
@@ -39,8 +37,6 @@ import { AppButton } from './ui';
 import { PlayGlyphIcon } from './ui-icons/MenuIcons';
 
 export type { ExtendedHomeModeDTO };
-
-const USE_NATIVE_DRIVER = Platform.OS !== 'web';
 
 export interface HomeScreenProps {
   readonly view: HomeViewDTO;
@@ -77,22 +73,7 @@ export function HomeScreen({
   const { theme, isDark } = useTheme(themeController);
   const styles = useMemo(() => createStyles(theme), [theme]);
   const { width: viewportWidth, height: viewportHeight } = useWindowDimensions();
-  const [reduceMotion, setReduceMotion] = useState(false);
-
-  useEffect(() => {
-    let mounted = true;
-    AccessibilityInfo.isReduceMotionEnabled().then((enabled) => {
-      if (mounted) setReduceMotion(enabled);
-    });
-    const subscription = AccessibilityInfo.addEventListener(
-      'reduceMotionChanged',
-      setReduceMotion,
-    );
-    return () => {
-      mounted = false;
-      subscription.remove();
-    };
-  }, []);
+  const reduceMotion = useReducedMotion();
 
   const layout = computeHomeLayoutMetrics(
     viewportWidth,
@@ -104,8 +85,6 @@ export function HomeScreen({
   const modesList = view.modes;
   const selectedId = view.selectedModeId ?? modesList[0]?.id ?? null;
   const [selectedMenu, setSelectedMenu] = useState<HomeMenuItemKey>('PLAY');
-  const [cardOpacity] = useState(() => new Animated.Value(1));
-  const isCardInitialMount = useRef(true);
 
   const selected = useMemo(
     () =>
@@ -114,24 +93,6 @@ export function HomeScreen({
       null,
     [modesList, selectedId],
   );
-
-  useEffect(() => {
-    if (isCardInitialMount.current) {
-      isCardInitialMount.current = false;
-      return;
-    }
-    if (reduceMotion) {
-      cardOpacity.setValue(1);
-      return;
-    }
-
-    cardOpacity.setValue(0.72);
-    Animated.timing(cardOpacity, {
-      toValue: 1,
-      duration: Math.round(MOTION.selectionMs * 0.7),
-      useNativeDriver: USE_NATIVE_DRIVER,
-    }).start();
-  }, [selectedId, reduceMotion, cardOpacity]);
 
   const handleSelectMode = (mode: HomeModeDTO) => {
     controller.selectMode(mode.id);
@@ -255,7 +216,8 @@ export function HomeScreen({
                         mode={selected}
                         shortLabel={resolveShortLabel(selected)}
                         errorMessage={view.errorMessage}
-                        cardOpacity={cardOpacity}
+                        transitionKey={selected.id}
+                        reduceMotion={reduceMotion}
                         layout={layout}
                         theme={theme}
                         isDark={isDark}

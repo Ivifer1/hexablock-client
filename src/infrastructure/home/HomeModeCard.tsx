@@ -1,9 +1,10 @@
 import { useMemo } from 'react';
-import { Animated, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import type { IAssetResolver, ITextCatalog, SupportedLocale } from '../../application/ports';
 import type { I18nKeyDTO } from '../../application/value-objects';
 import type { HomeLayoutMetrics } from '../homeLayout';
 import type { ModeIconComponent } from '../mode-icons';
+import { AnimatedFade, MOTION_TIMINGS } from '../motion';
 import { BORDER_WIDTH, RADIUS, SPACING, TYPOGRAPHY, type Theme } from '../theme';
 import {
   formatHomeProgress,
@@ -15,7 +16,8 @@ export interface HomeModeCardProps {
   readonly mode: ExtendedHomeModeDTO;
   readonly shortLabel: string;
   readonly errorMessage: I18nKeyDTO | null;
-  readonly cardOpacity: Animated.Value;
+  readonly transitionKey: string;
+  readonly reduceMotion: boolean;
   readonly layout: HomeLayoutMetrics;
   readonly theme: Theme;
   readonly isDark: boolean;
@@ -29,7 +31,8 @@ export function HomeModeCard({
   mode,
   shortLabel,
   errorMessage,
-  cardOpacity,
+  transitionKey,
+  reduceMotion,
   layout,
   theme,
   isDark,
@@ -50,7 +53,12 @@ export function HomeModeCard({
     errorMessage ?? (mode.progress.kind === 'ERROR' ? mode.progress.message : null);
 
   return (
-    <Animated.View style={[styles.container, { opacity: cardOpacity }]}>
+    <AnimatedFade
+      triggerKey={transitionKey}
+      durationMs={MOTION_TIMINGS.cardFade.durationMs}
+      reduceMotion={reduceMotion}
+      style={styles.container}
+    >
       <View
         testID="home-selected-mode-pill"
         style={[
@@ -145,7 +153,7 @@ export function HomeModeCard({
           {textCatalog.resolve(resolvedError, locale)}
         </Text>
       ) : null}
-    </Animated.View>
+    </AnimatedFade>
   );
 }
 

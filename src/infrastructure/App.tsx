@@ -5,6 +5,7 @@ import type { HomeViewDTO } from '../application/value-objects';
 import { CompositionRoot } from './CompositionRoot';
 import { DEFAULT_HOME_MODE_REGISTRATIONS } from './homeModeRegistrations';
 import { HomeScreen } from './HomeScreen';
+import { MotionRoot } from './motion';
 
 const homeNavigator: IHomeNavigationPort = {
   navigate: () => {
@@ -33,13 +34,15 @@ export default function App() {
   if (!view) return null;
 
   return (
-    <HomeScreen
-      view={view}
-      controller={compositionRoot.homeController}
-      textCatalog={compositionRoot.textCatalog}
-      themeController={compositionRoot.themeController}
-      modeIconResolver={compositionRoot.modeIconResolver}
-      previewResolver={compositionRoot.previewAssetResolver}
-    />
+    <MotionRoot>
+      <HomeScreen
+        view={view}
+        controller={compositionRoot.homeController}
+        textCatalog={compositionRoot.textCatalog}
+        themeController={compositionRoot.themeController}
+        modeIconResolver={compositionRoot.modeIconResolver}
+        previewResolver={compositionRoot.previewAssetResolver}
+      />
+    </MotionRoot>
   );
 }

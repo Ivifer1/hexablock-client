@@ -1,13 +1,12 @@
-import { useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 import {
-  Animated,
   Pressable,
   StyleSheet,
   View,
-  type GestureResponderEvent,
 } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import { HomePreviewVisual, type IHomePreview } from '../home-previews';
+import { AnimatedPulse, MOTION_SPRINGS, SwipeableSurface } from '../motion';
 import { BORDER_WIDTH, RADIUS, type Theme } from '../theme';
 import { ChevronIcon } from '../ui-icons/MenuIcons';
 import { withAlpha } from './shared';
@@ -17,7 +16,7 @@ export interface HexShowcaseFrameProps {
   readonly arrowButtonSize: number;
   readonly arrowGap: number;
   readonly activePreview: IHomePreview | null;
-  readonly corePulse: Animated.Value;
+  readonly pulseKey: string;
   readonly reduceMotion?: boolean;
   readonly totalModes: number;
   readonly prevModeLabel: string;
@@ -28,7 +27,6 @@ export interface HexShowcaseFrameProps {
   readonly onNextMode: () => void;
 }
 
-const SWIPE_THRESHOLD_PX = 28;
 const HEX_PATH =
   'M 99.61,22 Q 110,16 120.39,22 L 181.02,57 Q 191.41,63 191.41,75 L 191.41,145 Q 191.41,157 181.02,163 L 120.39,198 Q 110,204 99.61,198 L 38.98,163 Q 28.59,157 28.59,145 L 28.59,75 Q 28.59,63 38.98,57 Z';
 
@@ -67,7 +65,7 @@ export function HexShowcaseFrame({
   arrowButtonSize,
   arrowGap,
   activePreview,
-  corePulse,
+  pulseKey,
   reduceMotion,
   totalModes,
   prevModeLabel,
@@ -78,7 +76,6 @@ export function HexShowcaseFrame({
   onNextMode,
 }: HexShowcaseFrameProps) {
   const styles = useMemo(() => createStyles(theme), [theme]);
-  const swipeStartXRef = useRef<number | null>(null);
   const frameSvg = useMemo(
     () => buildHexShowcaseFrameSvg(theme.centerSurface, theme.primary, theme.primaryHover),
     [theme.centerSurface, theme.primary, theme.primaryHover],
@@ -87,28 +84,6 @@ export function HexShowcaseFrame({
     () => buildFallbackPreviewSvg(theme.primary, Math.round(showcaseSize * 0.45)),
     [theme.primary, showcaseSize],
   );
-
-  const handleStartShouldSetResponder = (event: GestureResponderEvent) => {
-    if (totalModes <= 1) return false;
-    swipeStartXRef.current = event.nativeEvent.pageX;
-    return false;
-  };
-
-  const handleMoveShouldSetResponder = (event: GestureResponderEvent) => {
-    if (totalModes <= 1 || swipeStartXRef.current === null) return false;
-    return Math.abs(event.nativeEvent.pageX - swipeStartXRef.current) > 10;
-  };
-
-  const handleResponderRelease = (event: GestureResponderEvent) => {
-    if (totalModes <= 1 || swipeStartXRef.current === null) return;
-    const dx = event.nativeEvent.pageX - swipeStartXRef.current;
-    swipeStartXRef.current = null;
-    if (dx <= -SWIPE_THRESHOLD_PX) {
-      onNextMode();
-    } else if (dx >= SWIPE_THRESHOLD_PX) {
-      onPrevMode();
-    }
-  };
 
   const arrowSurface = isDark ? withAlpha(theme.surface, 'E6') : theme.surface;
 
@@ -136,14 +111,11 @@ export function HexShowcaseFrame({
         </Pressable>
       ) : null}
 
-      <View
+      <SwipeableSurface
         testID="home-hex-showcase"
-        onStartShouldSetResponder={handleStartShouldSetResponder}
-        onMoveShouldSetResponder={handleMoveShouldSetResponder}
-        onResponderRelease={handleResponderRelease}
-        onResponderTerminate={() => {
-          swipeStartXRef.current = null;
-        }}
+        enabled={totalModes > 1}
+        onSwipeLeft={onNextMode}
+        onSwipeRight={onPrevMode}
         style={[
           styles.showcaseContainer,
           { width: showcaseSize, height: showcaseSize },
@@ -165,7 +137,12 @@ export function HexShowcaseFrame({
           <SvgXml xml={frameSvg} width={showcaseSize} height={showcaseSize} />
         </View>
 
-        <Animated.View style={[styles.previewLayer, { transform: [{ scale: corePulse }] }]}>
+        <AnimatedPulse
+          triggerKey={pulseKey}
+          spring={MOTION_SPRINGS.corePulse}
+          reduceMotion={reduceMotion}
+          style={styles.previewLayer}
+        >
           {activePreview ? (
             <HomePreviewVisual
               preview={activePreview}
@@ -181,8 +158,8 @@ export function HexShowcaseFrame({
               testID="home-center-preview"
             />
           )}
-        </Animated.View>
-      </View>
+        </AnimatedPulse>
+      </SwipeableSurface>
 
       {totalModes > 1 ? (
         <Pressable
